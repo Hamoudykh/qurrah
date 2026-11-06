@@ -7,6 +7,7 @@ import { searchCity } from '../core/api.js';
 import { CITIES } from '../data/cities.js';
 import { requestPermission, permission, notify, notificationsSupported } from '../core/notify.js';
 import { ic } from './ui.js';
+import { prayerIcon, skyPeriod, skyStars } from './viz.js';
 import * as adhan from '../../vendor/adhan.esm.min.js';
 
 export async function render(ctx) {
@@ -77,25 +78,35 @@ export async function render(ctx) {
     const info = METHOD_INFO[ps.method];
     const notifyOn = ps.notify.enabled && permission() === 'granted';
 
+    const period = skyPeriod(r.today, now);
+    const tomorrowTxt = r.next.tomorrow ? ` (${t('tomorrow')})` : '';
     mount(ctx.el, html`
-      <section class="card times-card">
-        <div class="row between wrap">
-          <div><p class="eyebrow">${ic('pin')} ${loc.label}</p><p class="small muted">${greg} · ${hijriDate(now, getLang(), loc.tz)}</p></div>
-          <button class="btn ghost small" data-act="edit-loc">${t('change')}</button>
+      <section class="sky sky-${period} times-hero">
+        ${skyStars()}
+        <div class="hero-top">
+          <div><p class="hijri">${hijriDate(now, getLang(), loc.tz)}</p><p class="greg">${greg}</p></div>
+          <button class="loc-chip" data-act="edit-loc" aria-label="${t('change')}">${ic('pin')} ${loc.label}</button>
         </div>
-        ${loc.tz !== deviceTz ? html`<p class="small note">${t('timesInZone', { tz: loc.tz })}</p>` : ''}
-        <div class="next-big"><p class="eyebrow">${t('nextPrayer')}: ${t(`prayer_${r.next.key}`)}${r.next.tomorrow ? ` (${t('tomorrow')})` : ''}</p>
-          <p class="cd big" dir="ltr" id="cd">${formatCountdown(r.next.time - now)}</p></div>
-        <ul class="times-list">
-          ${PRAYER_KEYS.map((k) => html`<li class="${r.current === k ? 'current' : ''} ${r.next.key === k && !r.next.tomorrow ? 'next' : ''} ${k === 'sunrise' ? 'sunrise' : ''}">
-            <span>${t(`prayer_${k}`)}${k === 'sunrise' ? html` <span class="small muted">${t('sunriseNote')}</span>` : ''}</span>
-            <span class="tm" dir="ltr">${tf(r.today[k])}</span></li>`)}
+        <p class="hero-label" style="margin-top:26px">${t('nextPrayer')}: <b>${t(`prayer_${r.next.key}`)}</b>${tomorrowTxt}</p>
+        <p class="cd big" dir="ltr" id="cd">${formatCountdown(r.next.time - now)}</p>
+      </section>
+      ${loc.tz !== deviceTz ? html`<p class="small note">${t('timesInZone', { tz: loc.tz })}</p>` : ''}
+
+      <section class="card">
+        <ul class="timeline">
+          ${PRAYER_KEYS.map((k) => {
+            const isNext = r.next.key === k && !r.next.tomorrow;
+            const cls = [r.current === k ? 'current' : '', isNext ? 'next' : '', !isNext && r.current !== k && r.today[k] < now ? 'past' : ''].join(' ');
+            return html`<li class="${cls}"><span class="t-ic c-${k}">${prayerIcon(k)}</span>
+              <span class="t-name">${t(`prayer_${k}`)}${k === 'sunrise' ? html`<small>${t('sunriseNote')}</small>` : r.current === k ? html`<small>${t('nowTime')}</small>` : ''}</span>
+              <span class="tm" dir="ltr">${tf(r.today[k])}</span></li>`;
+          })}
         </ul>
         <p class="small method-line">${ic('info')} ${t('methodInUse')}: <strong>${t(`method_${ps.method}`)}</strong> (${t('fajrAngle')} ${info.fajr}, ${t('ishaAngle')} ${info.isha}) · ${t('asr')}: <strong>${t(ps.madhab === 'hanafi' ? 'asrHanafi' : 'asrStandard')}</strong> · ${t('highLatRule')}: ${highLatLabel(ps, loc)}</p>
-        <p class="small muted">${t('checkLocalMosque')}</p>
+        <p class="small muted" style="margin-bottom:0">${t('checkLocalMosque')}</p>
       </section>
 
-      <a class="card link-card" href="#/qibla"><div><h3>${ic('compass')} ${t('qibla')}</h3><p class="muted small">${t('qiblaTeaser')}</p></div>${ic('forward', 'flip-rtl')}</a>
+      <a class="q-tile" href="#/qibla"><span class="q-ic sky">${ic('compass')}</span><span class="q-text"><b>${t('qibla')}</b><small>${t('qiblaTeaser')}</small></span><span style="margin-inline-start:auto">${ic('forward', 'flip-rtl')}</span></a>
 
       <section class="card">
         <h3>${t('calculation')}</h3>

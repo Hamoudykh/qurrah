@@ -3,7 +3,7 @@
 // "qurrah-data-v1" / "qurrah-audio-v1") when you open or save a passage.
 // Bump VERSION when files change; shell files are also refreshed in the background.
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v2.0.0';
 const SHELL_CACHE = `qurrah-shell-${VERSION}`;
 
 const SHELL = [
@@ -14,10 +14,12 @@ const SHELL = [
   './js/data/catalog.js', './js/data/cities.js', './js/data/daily.js', './js/data/fiqh.js', './js/data/khushu.js', './js/data/meta.js', './js/data/refs.js', './js/data/virtues.js',
   './js/i18n/en.js', './js/i18n/ar.js', './js/i18n/he.js',
   './js/views/item.js', './js/views/learn.js', './js/views/me.js', './js/views/passage.js', './js/views/pray.js', './js/views/qibla.js',
-  './js/views/review.js', './js/views/settings.js', './js/views/sources.js', './js/views/times.js', './js/views/today.js', './js/views/ui.js', './js/views/welcome.js',
+  './js/views/review.js', './js/views/settings.js', './js/views/sources.js', './js/views/times.js', './js/views/today.js', './js/views/ui.js', './js/views/viz.js', './js/views/welcome.js',
   './vendor/adhan.esm.min.js',
   './fonts/amiri-quran-arabic.woff2', './fonts/amiri-quran-latin.woff2',
-  './fonts/noto-naskh-arabic-400.woff2', './fonts/noto-naskh-arabic-600.woff2', './fonts/noto-naskh-arabic-700.woff2',
+  './fonts/amiri-400.woff2', './fonts/amiri-700.woff2', './fonts/noto-naskh-arabic-400.woff2',
+  './fonts/plex-arabic-400.woff2', './fonts/plex-arabic-500.woff2', './fonts/plex-arabic-600.woff2', './fonts/plex-arabic-700.woff2',
+  './fonts/plex-arabic-latin-400.woff2', './fonts/plex-arabic-latin-600.woff2', './fonts/plex-arabic-latin-700.woff2',
   './fonts/noto-sans-hebrew-400.woff2', './fonts/noto-sans-hebrew-600.woff2', './fonts/noto-sans-hebrew-700.woff2',
   './icons/icon.svg', './icons/icon-mono.svg', './icons/icon-maskable.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png', './icons/badge-96.png',

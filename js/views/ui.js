@@ -6,6 +6,7 @@ import { COUNTS } from '../data/meta.js';
 import { COLLECTIONS, GRADES, refURL } from '../data/refs.js';
 import { getState } from '../core/store.js';
 import { daysUntilDue } from '../logic/srs.js';
+import { ring, medallion } from './viz.js';
 
 // ---- icons (simple 24×24 stroke icons drawn for this app) ----
 const P = {
@@ -41,6 +42,8 @@ const P = {
   heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
   globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.3 3.5 5.3 3.5 8.5s-1 6.2-3.5 8.5c-2.5-2.3-3.5-5.3-3.5-8.5s1-6.2 3.5-8.5z"/>',
   text: '<path d="M5 6.5V5h14v1.5M12 5v14M9 19h6"/>',
+  share: '<path d="M12 3.5v11M8 7.5l4-4 4 4M5.5 12.5v6a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-6"/>',
+  sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
   wifiOff: '<path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 4-2.3M12 9.5c2.7 0 5.2 1 7 2.8M2 9.5A15 15 0 0 1 7 6.6M12 5c3.9 0 7.4 1.5 10 4"/><circle cx="12" cy="19.5" r=".8" fill="currentColor"/>',
 };
 
@@ -146,5 +149,40 @@ export function itemRow(item, { href = `#/item/${encodeURIComponent(item.id)}`, 
       <span class="li-sub"><span class="ltr-num" dir="ltr">${rangeLabel(item)}</span> · ${t('ayahsN', { count: ayahCount(item), n: fmtNum(ayahCount(item)) })}${w ? ` · ${t('wordsN', { count: w, n: fmtNum(w) })}` : ''}</span>
     </span>
     <span class="li-side">${levelBadge(item.level)}${statusChip(item.id)}${extra}</span>
+  </a>`;
+}
+
+/** Arabic name of an item: passage title, or the surah's Arabic name (from the API metadata). */
+export function arabicName(item) {
+  if (item.names) return item.names.ar;
+  const c = chapter(item.surah);
+  return item.type === 'passage' ? `${c.nameArabic} ${rangeLabel(item)}` : c.nameArabic;
+}
+
+/** Memorization progress of an item in [0,1] (known = 1). */
+export function itemProgress(item) {
+  const st = getState().items[item.id];
+  if (!st) return 0;
+  if (st.status === 'known') return 1;
+  return Object.values(st.ayahs || {}).filter((v) => v === 'memorized').length / Math.max(1, ayahCount(item));
+}
+
+/** Surah/passage tile for grids: star medallion inside a progress ring, Arabic name. */
+export function tile(item, { suggested = false } = {}) {
+  const st = getState().items[item.id];
+  const known = st?.status === 'known';
+  const c = chapter(item.surah);
+  const n = ayahCount(item);
+  const sub = getLang() === 'ar'
+    ? (item.type === 'passage' ? `${c.nameArabic} · ${rangeLabel(item)}` : t('ayahsN', { count: n, n: fmtNum(n) }))
+    : `${item.type === 'passage' && item.names ? L(item.names) : c.nameSimple} · ${t('ayahsN', { count: n, n: fmtNum(n) })}`;
+  const status = known ? html`<span class="chip ok">${ic('check')} ${t('statusKnown')}</span>${daysUntilDue(st.srs) <= 0 ? html`<span class="chip warn">${t('reviewDue')}</span>` : ''}`
+    : st ? html`<span class="chip learning">${t('statusLearning')}</span>`
+    : suggested ? html`<span class="chip gold">${ic('sparkle')} ${t('suggested')}</span>` : '';
+  return html`<a class="tile ${known ? 'known' : ''}" href="#/item/${encodeURIComponent(item.id)}">
+    ${ring(itemProgress(item), { size: 60, stroke: 4, cls: known ? 'done' : '', inner: medallion(item.surah) })}
+    <span class="tile-name" lang="ar" dir="rtl">${arabicName(item)}</span>
+    <span class="tile-sub">${sub}</span>
+    <span class="tile-status">${status}</span>
   </a>`;
 }

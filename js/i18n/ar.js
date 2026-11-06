@@ -215,4 +215,20 @@ export default {
   reviewsDueN_one: 'سورة واحدة للمراجعة اليوم — دقائق قليلة تُثبّت الحفظ.', reviewsDueN_two: 'سورتان للمراجعة اليوم — دقائق قليلة تُثبّت الحفظ.',
   rakahsN_two: 'ركعتان',
 
+
+  // redesign (v2)
+  nextPrayerTomorrow: 'الصلاة القادمة · غدًا', inTime: 'بعد {time}', setYourPlace: 'أين أنت؟', nowTime: 'الآن',
+  reviewsDueShort: '{n} اليوم', reviewsDueShort_one: 'واحدة اليوم', reviewsDueShort_two: 'اثنتان اليوم', nothingDue: 'لا شيء الآن', qiblaTeaserShort: 'اتجاه الكعبة',
+  addToLearningShort: 'أضف للحفظ', share: 'مشاركة', copied: 'نُسخ النص — الصقه حيث تشاء للمشاركة.',
+  yourJourney: 'رحلتك', knownOfTotal: '{known} من {total} محفوظة', suggested: 'التالية',
+  makki: 'مكية', madani: 'مدنية', repeatSettings: 'إعدادات التكرار', iMemorizedIt: 'حفظتها',
+  swipeHint: 'اسحب أو استخدم الأسهم للتنقل بين الآيات', listMode: 'عرض كل الآيات', focusMode: 'العودة إلى وضع التركيز',
+  surahsYouKnowShort: 'محفوظة', yourSky: 'سماء محفوظاتك', skyHint: 'كل نجمة سورة أو مقطع، تضيء حين تحفظه.', legendNew: 'لم تُحفظ بعد',
+  streakDays: 'أيام متتالية', streakDays_one: 'يوم', streakDays_two: 'يومان متتاليان', streakDays_many: 'يومًا متتاليًا', streakDays_other: 'يوم متتالٍ',
+  letsBegin: 'لنبدأ', nextWithN: 'التالي · اخترت {n}', skipForNow: 'لا شيء بعد — التالي',
+  stepTimesTitle: 'مواقيت الصلاة', stepTimesHint: 'اسمح بتحديد موقعك لترى مواقيت صلاة اليوم واتجاه القبلة، ويمكنك اختيار مدينتك لاحقًا من قسم المواقيت.',
+  startApp: 'بسم الله، لنبدأ',
+
+  knownShort: 'أحفظها مسبقًا',
+  xOfY: '{a} من {b}',
 };

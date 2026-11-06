@@ -8,10 +8,11 @@ const KEY = 'qurrah:v1';
 const listeners = new Set();
 
 export const DEFAULTS = Object.freeze({
-  v: 1,
+  v: 2,
   onboarded: false,
   settings: {
-    lang: null, // null = pick from browser on first run
+    lang: 'ar', // Arabic is the main language; English and Hebrew are available in Settings
+    langChosen: false, // true once the user picks a language themselves
     theme: 'system',
     arabicSize: 34,
     showTranslit: false,
@@ -55,7 +56,14 @@ function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return structuredClone(DEFAULTS);
-    return deepMerge(structuredClone(DEFAULTS), JSON.parse(raw));
+    const saved = JSON.parse(raw);
+    const s = deepMerge(structuredClone(DEFAULTS), saved);
+    // v1 → v2: Arabic became the main language. Switch anyone who never picked a language.
+    if ((saved.v || 1) < 2) {
+      if (!saved.settings?.langChosen) s.settings.lang = 'ar';
+      s.v = 2;
+    }
+    return s;
   } catch {
     return structuredClone(DEFAULTS);
   }
@@ -87,6 +95,7 @@ export function subscribe(fn) {
 
 export function setSetting(path, value) {
   update((s) => {
+    if (path === 'lang') s.settings.langChosen = true;
     const keys = path.split('.');
     let o = s.settings;
     for (const k of keys.slice(0, -1)) o = o[k];

@@ -68,7 +68,9 @@ it streams but cannot be saved offline. Reciters whose audio cannot be saved sho
 ## Fonts (bundled, so nothing is fetched from font CDNs)
 
 * **Amiri Quran**: © The Amiri Project Authors, SIL Open Font License 1.1 (`fonts/OFL-amiri-quran.txt`). Checked to cover all 62 characters used in the Quran.com Uthmani text of the catalog.
-* **Noto Naskh Arabic**, **Noto Sans Hebrew**: Google Noto, SIL Open Font License 1.1.
+* **Amiri** (headings and surah names): © The Amiri Project Authors, SIL OFL 1.1 (`fonts/OFL-amiri.txt`).
+* **IBM Plex Sans Arabic** (interface text): © IBM Corp., SIL OFL 1.1 (`fonts/OFL-ibm-plex-sans-arabic.txt`).
+* **Noto Naskh Arabic** (tafsir text), **Noto Sans Hebrew**: Google Noto, SIL Open Font License 1.1.
 * Packaged from [Fontsource](https://fontsource.org) 5.3.0.
 
 ## Generated metadata (names and counts only)

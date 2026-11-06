@@ -220,4 +220,20 @@ export default {
   bestStreak_one: 'Best: {n} day', nextReviewIn_one: 'Next review tomorrow', ayahsN_one: '{n} ayah', wordsN_one: '{n} word',
   reviewsDueN_one: '{n} to review today — a few minutes keeps it strong.', ayahsMemorizedN_one: '{n} ayah memorized',
 
+
+  // redesign (v2)
+  nextPrayerTomorrow: 'Next prayer · tomorrow', inTime: 'in {time}', setYourPlace: 'Where are you?', nowTime: 'now',
+  reviewsDueShort: '{n} due today', reviewsDueShort_one: '1 due today', nothingDue: 'All caught up', qiblaTeaserShort: 'Direction of the Kaaba',
+  addToLearningShort: 'Learn it', share: 'Share', copied: 'Copied — paste it anywhere to share.',
+  yourJourney: 'Your journey', knownOfTotal: '{known} of {total} known', suggested: 'Next',
+  makki: 'Makki', madani: 'Madani', repeatSettings: 'Repetition settings', iMemorizedIt: 'I memorized it',
+  swipeHint: 'Swipe or use the arrows to move between ayahs', listMode: 'Show all ayahs', focusMode: 'Back to focus mode',
+  surahsYouKnowShort: 'known', yourSky: 'Your sky', skyHint: 'Every star is a surah or passage. It lights up when you memorize it.', legendNew: 'Not yet',
+  streakDays: 'days in a row', streakDays_one: 'day in a row',
+  letsBegin: 'Let\'s begin', nextWithN: 'Next · {n} chosen', skipForNow: 'None yet — next',
+  stepTimesTitle: 'Prayer times', stepTimesHint: 'Allow your location to see today\'s prayer times and the qibla. You can also choose a city later in the Times tab.',
+  startApp: 'Bismillah — start',
+
+  knownShort: 'I know it',
+  xOfY: '{a} of {b}',
 };

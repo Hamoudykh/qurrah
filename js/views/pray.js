@@ -1,4 +1,4 @@
-import { html, mount, on, toast } from '../core/dom.js';
+import { html, mount, on, toast, celebrate } from '../core/dom.js';
 import { t, fmtNum, intlLocale } from '../core/i18n.js';
 import { getState, settings, markPrayed, unmarkPrayed, bumpPlanSeed, setSetting } from '../core/store.js';
 import { planDay, sunnahSuggestions } from '../logic/planner.js';
@@ -9,6 +9,7 @@ import { KHUSHU_TIPS, CHECKLIST } from '../data/khushu.js';
 import { FIQH_NOTES, FIQH_DISCLAIMER } from '../data/fiqh.js';
 import { ic, itemTitle, rangeLabel, refsList, ctext } from './ui.js';
 import { plannerPool } from './passage.js';
+import { prayerIcon, medallion } from './viz.js';
 
 const TABS = ['plan', 'recite', 'khushu'];
 
@@ -42,19 +43,19 @@ export async function render(ctx) {
         <ul>${CHECKLIST.map((c) => html`<li><label><input type="checkbox" data-check="${c.id}" ${checked.has(c.id) ? 'checked' : ''}> ${ctext(c.text)}</label></li>`)}</ul>
       </details>
 
-      ${plan.prayers.map((p) => html`<section class="card prayer-card ${prayed[p.id] ? 'done' : ''}">
-        <div class="row between">
-          <h3>${t(`prayer_${p.id}`)}${times ? html` <span class="small muted">${formatTime(times[p.id], loc.tz, intlLocale())}</span>` : ''}</h3>
-          <span class="small muted">${t('rakahsN', { count: p.rakahs.length, n: fmtNum(p.rakahs.length) })}</span>
+      ${plan.prayers.map((p) => html`<section class="card prayer-card ${prayed[p.id] ? 'done' : ''}" id="pc-${p.id}">
+        <div class="pc-head c-${p.id}">${prayerIcon(p.id)}
+          <div><h3>${t(`prayer_${p.id}`)}</h3>${times ? html`<span class="pc-time" dir="ltr">${formatTime(times[p.id], loc.tz, intlLocale())}</span>` : ''}</div>
+          <span class="pc-rk">${t('rakahsN', { count: p.rakahs.length, n: fmtNum(p.rakahs.length) })}</span>
         </div>
-        <ol class="rakahs">
-          ${p.rakahs.map((r) => html`<li><span class="rk-n">${t('rakahN', { n: fmtNum(r.n) })}</span>
-            <span class="rk-body">${t('alFatihah')}${r.item ? html` + ${itemLink(r.item)}` : html` <span class="small muted">${t('fatihaOnly')}</span>`}</span></li>`)}
-        </ol>
-        ${p.repeated ? html`<p class="small muted">${t('repeatedNote')}</p>` : ''}
-        <div class="row gap wrap">
+        <div class="pc-body">
+          <ol class="rakahs">
+            ${p.rakahs.map((r) => html`<li class="${r.item ? 'has-surah' : ''}"><span class="rk-n" aria-label="${t('rakahN', { n: fmtNum(r.n) })}">${fmtNum(r.n)}</span>
+              <span class="rk-body">${t('alFatihah')}${r.item ? html` + ${itemLink(r.item)}` : html` <span class="small muted">${t('fatihaOnly')}</span>`}</span></li>`)}
+          </ol>
+          ${p.repeated ? html`<p class="small muted">${t('repeatedNote')}</p>` : ''}
           ${prayed[p.id] ? html`<button class="btn ok" data-unpray="${p.id}">${ic('check')} ${t('prayed')}</button>`
-            : html`<button class="btn" data-pray="${p.id}" ${pool.length ? '' : 'disabled'}>${t('iPrayedThis')}</button>`}
+            : html`<button class="btn primary" data-pray="${p.id}" ${pool.length ? '' : 'disabled'}>${ic('check')} ${t('iPrayedThis')}</button>`}
         </div>
       </section>`)}
 
@@ -81,7 +82,7 @@ export async function render(ctx) {
   const drawKhushu = () => html`
     <p class="lead">${t('khushuIntro')}</p>
     ${KHUSHU_TIPS.map((k, i) => html`<details class="card tip" ${i === 0 ? 'open' : ''} id="tip-${k.id}">
-      <summary><h3>${ctext(k.title)}</h3></summary>
+      <summary>${medallion(i + 1)}<h3>${ctext(k.title)}</h3></summary>
       <p>${ctext(k.body)}</p>
       ${k.note ? html`<p class="differ small">${ctext(k.note)}</p>` : ''}
       <p class="practice"><span class="eyebrow">${t('tryThis')}</span> ${ctext(k.practice)}</p>
@@ -106,6 +107,7 @@ export async function render(ctx) {
       const plan = planDay(plannerPool(), { today: dayNumber(), seed: s.planSeed[dayKey()] || 0 });
       const p = plan.prayers.find((x) => x.id === b.dataset.pray);
       markPrayed(p.id, p.rakahs.map((r) => r.item).filter(Boolean));
+      celebrate(b);
       toast(t('prayedToast'));
       draw();
     }),

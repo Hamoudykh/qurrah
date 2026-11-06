@@ -1,10 +1,11 @@
 import { html, mount, on, toast } from '../core/dom.js';
-import { t, fmtNum } from '../core/i18n.js';
+import { t, fmtNum, getLang } from '../core/i18n.js';
 import { getState, startLearning, markKnown } from '../core/store.js';
 import { CATALOG, LEVELS, LEVEL_RULES, itemFromId, customItem } from '../data/catalog.js';
 import { CHAPTERS } from '../data/meta.js';
 import { suggestNext } from '../logic/suggest.js';
-import { ic, itemRow, itemTitle, surahName } from './ui.js';
+import { ic, itemTitle, surahName, tile } from './ui.js';
+import { ring } from './viz.js';
 
 const FILTERS = ['all', 'easy', 'medium', 'hard', 'mine'];
 
@@ -17,48 +18,58 @@ export async function render(ctx) {
     const s = getState();
     const sug = suggestNext(s.items);
     const custom = Object.keys(s.items).map(itemFromId).filter((it) => it && it.custom);
-    const matches = (it) => !q || itemTitle(it).toLowerCase().includes(q) || String(it.surah) === q || surahName(it.surah).toLowerCase().includes(q);
+    const matches = (it) => !q || itemTitle(it).toLowerCase().includes(q) || String(it.surah) === q || surahName(it.surah).toLowerCase().includes(q)
+      || CHAPTERS[it.surah - 1].nameArabic.includes(q) || CHAPTERS[it.surah - 1].nameSimple.toLowerCase().includes(q);
     let items;
     if (filter === 'mine') items = [...CATALOG, ...custom].filter((it) => s.items[it.id]);
     else if (filter === 'all') items = CATALOG.filter((c) => c.level !== 'foundation');
     else items = CATALOG.filter((c) => c.level === filter);
     items = items.filter(matches);
-    const mineKnown = Object.values(s.items).filter((x) => x.status === 'known').length;
+    const knownAll = CATALOG.filter((c) => c.level !== 'foundation' && s.items[c.id]?.status === 'known').length;
+    const totalAll = CATALOG.length - 1;
 
     mount(ctx.el, html`
-      <div class="seg scroll" role="tablist" aria-label="${t('filterByLevel')}">
-        ${FILTERS.map((f) => html`<button role="tab" aria-selected="${filter === f}" class="${filter === f ? 'on' : ''}" data-filter="${f}">${f === 'mine' ? t('mySurahs') : f === 'all' ? t('all') : t(`level_${f}`)}</button>`)}
+      <section class="card journey">
+        <div class="journey-head"><h2>${t('yourJourney')}</h2><span class="small muted">${t('knownOfTotal', { known: fmtNum(knownAll), total: fmtNum(totalAll) })}</span></div>
+        <div class="levels">
+          ${LEVELS.map((l) => {
+            const p = sug.progress[l];
+            return html`<button class="level-node lvl-${l} ${sug.level === l ? 'current' : ''} ${filter === l ? 'on' : ''}" data-filter="${l}" aria-pressed="${filter === l}">
+              ${ring(p.known / p.total, { size: 66, stroke: 5, inner: html`<b>${fmtNum(p.known)}</b>` })}
+              <b>${t(`level_${l}`)}</b><small>${t('xOfY', { a: fmtNum(p.known), b: fmtNum(p.total) })}</small></button>`;
+          })}
+        </div>
+        ${LEVELS.includes(filter) ? html`<p class="small muted center" style="margin:10px 0 0">${t(`levelRule_${filter}`, { words: fmtNum(LEVEL_RULES[filter].maxWords ?? 45), ayah: fmtNum(LEVEL_RULES[filter].maxAyahWords ?? 18) })}</p>` : ''}
+      </section>
+
+      <div class="filter-row" role="tablist" aria-label="${t('filterByLevel')}">
+        ${FILTERS.map((f) => html`<button role="tab" aria-selected="${filter === f}" class="chip-toggle ${filter === f ? 'on' : ''}" data-filter="${f}">${f === 'mine' ? t('mySurahs') : f === 'all' ? t('all') : t(`level_${f}`)}</button>`)}
       </div>
       <label class="search">${ic('search')}<input type="search" placeholder="${t('searchSurah')}" value="${q}" aria-label="${t('searchSurah')}"></label>
 
       ${filter === 'all' && !q ? html`<a class="card link-card foundation" href="#/item/s1">
-          <div><p class="eyebrow">${t('foundation')}</p><h3>${itemTitle(CATALOG[0])}</h3><p class="muted small">${t('foundationNote')}</p></div>${ic('forward', 'flip-rtl')}</a>` : ''}
+          <div><p class="eyebrow">${ic('star')} ${t('foundation')}</p><h3 lang="ar">${CHAPTERS[0].nameArabic}</h3><p class="muted small">${t('foundationNote')}</p></div>
+          <span class="round-btn" style="background:rgba(255,255,255,.15);color:#fff">${ic('forward', 'flip-rtl')}</span></a>` : ''}
 
-      ${LEVELS.includes(filter) ? html`<p class="muted small level-rule">${t(`levelRule_${filter}`, { words: LEVEL_RULES[filter].maxWords ?? 45, ayah: LEVEL_RULES[filter].maxAyahWords ?? 18 })}
-        · ${t('levelProgress', { known: fmtNum(sug.progress[filter].known), total: fmtNum(sug.progress[filter].total) })}</p>` : ''}
+      ${filter === 'mine' && !items.length ? html`<p class="muted empty">${t('mySurahsEmpty')}</p>` : ''}
+      ${items.length ? html`<div class="tiles">${items.map((it) => tile(it, { suggested: sug.next?.id === it.id }))}</div>` : (filter !== 'mine' ? html`<p class="muted empty">${t('noMatches')}</p>` : '')}
 
-      ${filter === 'mine' ? html`<p class="muted small">${t('mySurahsSummary', { n: fmtNum(mineKnown) })}</p>` : ''}
-
-      <div class="list">
-        ${items.length ? items.map((it) => itemRow(it)) : html`<p class="muted empty">${filter === 'mine' ? t('mySurahsEmpty') : t('noMatches')}</p>`}
-      </div>
-
-      <section class="card">
-        <h3>${t('addCustom')}</h3>
+      <details class="card custom-card">
+        <summary>${ic('plus')} ${t('addCustom')}</summary>
         <p class="muted small">${t('addCustomHint')}</p>
         <form class="custom-form" data-form="custom">
           <label class="field"><span>${t('surah')}</span>
-            <select name="surah">${CHAPTERS.map((c) => html`<option value="${c.id}">${c.id}. ${surahName(c.id)}</option>`)}</select></label>
+            <select name="surah">${CHAPTERS.map((c) => html`<option value="${c.id}">${c.id}. ${getLang() === 'ar' ? c.nameArabic : `${c.nameSimple} · ${c.nameArabic}`}</option>`)}</select></label>
           <div class="row gap">
             <label class="field"><span>${t('fromAyah')}</span><input name="from" type="number" min="1" value="1" inputmode="numeric"></label>
             <label class="field"><span>${t('toAyah')}</span><input name="to" type="number" min="1" value="7" inputmode="numeric"></label>
           </div>
           <div class="row gap wrap">
-            <button class="btn" name="mode" value="learn">${ic('plus')} ${t('addToLearning')}</button>
+            <button class="btn primary" name="mode" value="learn">${ic('plus')} ${t('addToLearning')}</button>
             <button class="btn ghost" name="mode" value="known">${ic('check')} ${t('iKnowThis')}</button>
           </div>
         </form>
-      </section>
+      </details>
       <p class="small muted center"><a href="#/sources#levels">${t('howLevelsWork')}</a></p>
     `);
     const sel = ctx.el.querySelector('select[name=surah]');
@@ -75,7 +86,12 @@ export async function render(ctx) {
   draw();
 
   const offs = [
-    on(ctx.el, 'click', '[data-filter]', (e, b) => { filter = b.dataset.filter; history.replaceState(null, '', `#/learn?filter=${filter}`); draw(); }),
+    on(ctx.el, 'click', '[data-filter]', (e, b) => {
+      const f = b.dataset.filter;
+      filter = filter === f && LEVELS.includes(f) ? 'all' : f;
+      history.replaceState(null, '', `#/learn?filter=${filter}`);
+      draw();
+    }),
     on(ctx.el, 'input', 'input[type=search]', (e, inp) => {
       q = inp.value.trim().toLowerCase();
       const pos = inp.selectionStart;

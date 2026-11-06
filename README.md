@@ -4,16 +4,22 @@
 
 A mobile-first, installable web app (PWA) that helps you **grow the surahs you recite in
 salah**, **understand what you are saying**, and **pray with more khushu'**.
-English, Arabic and Hebrew interface with full RTL, dark mode, and offline use. No ads,
-no tracking, no login.
+Arabic-first interface (English and Hebrew also available) with full RTL, dark mode, and
+offline use. No ads, no tracking, no login.
 
-| Today | Read | Memorize | Prayer plan | Times | Qibla |
-|---|---|---|---|---|---|
-| ![](docs/screenshots/02-today.png) | ![](docs/screenshots/04-item-read.png) | ![](docs/screenshots/05-item-memorize.png) | ![](docs/screenshots/09-pray-plan.png) | ![](docs/screenshots/07-times.png) | ![](docs/screenshots/08-qibla.png) |
+**Arabic is the main language** (right-to-left throughout); English and Hebrew are one tap away in Settings.
 
-| Arabic (RTL) | Hebrew | Dark | Khushu' | Progress |
+| Today | Learn | Memorize (focus mode) | Your sky |
+|---|---|---|---|
+| ![](docs/screenshots/a-today.png) | ![](docs/screenshots/b-learn.png) | ![](docs/screenshots/d-memorize.png) | ![](docs/screenshots/h-me.png) |
+
+| Daily verse | Surah page | Prayer plan | Prayer times | Khushu' |
 |---|---|---|---|---|
-| ![](docs/screenshots/12-today-ar.png) | ![](docs/screenshots/14-item-he.png) | ![](docs/screenshots/15-item-dark.png) | ![](docs/screenshots/10-khushu.png) | ![](docs/screenshots/11-me.png) |
+| ![](docs/screenshots/j-today-scrolled.png) | ![](docs/screenshots/c-item-read.png) | ![](docs/screenshots/f-pray.png) | ![](docs/screenshots/g-times.png) | ![](docs/screenshots/i-khushu.png) |
+
+| Welcome | Pick what you know | Dark | English |
+|---|---|---|---|
+| ![](docs/screenshots/m-onb-0.png) | ![](docs/screenshots/n-onb-1.png) | ![](docs/screenshots/k-today-dark.png) | ![](docs/screenshots/o-today-en.png) |
 
 ## The most important rule: content accuracy
 
@@ -89,24 +95,26 @@ Notifications on iPhone require iOS 16.4+ and the app installed to the Home Scre
 npm test
 ```
 
-24 unit tests, no dependencies (Node ≥ 18). They cover:
+27 unit tests, no dependencies (Node ≥ 18). They cover:
 * spaced repetition, planner rules, qibla (checked against the Adhan library), prayer times, .ics output, streaks
 * level rules against the API word counts
 * reference well-formedness
 * i18n key and plural parity across en/ar/he
 * service-worker coverage of every app file
 * the "no Quran text in source" guard
+* the Arabic-default migration for existing users
 
 ```bash
 npm run smoke
 ```
 
-An end-to-end run in a phone-sized Chromium against the **live** Quran.com API: onboarding,
-daily verse, reading, audio, the repeat loop, hide-words, Ibn Kathir, saving audio offline,
+An end-to-end run (27 checks) in a phone-sized Chromium against the **live** Quran.com API:
+Arabic-first launch, onboarding, daily verse, reading, audio, focus mode and the repeat ring,
+hide-words, Ibn Kathir, saving audio offline,
 a custom passage, a review, the Tanzil fallback, prayer times, qibla, the calendar export,
 Arabic/Hebrew/dark mode, and an offline reload. It needs Playwright
 (`npm i -D playwright && npx playwright install chromium`). Add `-- --shots=docs/screenshots`
-to regenerate the screenshots.
+to regenerate the screenshots (or run `npm run shots` for the docs set).
 
 ## Regenerating generated data
 
@@ -131,8 +139,9 @@ js/data/   catalog.js (refs + levels only)  virtues.js  khushu.js  fiqh.js  dail
            meta.js, cities.js (generated)
 js/views/  today  learn  item  review  pray  times  qibla  me  settings  sources  welcome
 js/i18n/   en.js  ar.js  he.js
-vendor/    adhan.esm.min.js (MIT)       fonts/  Amiri Quran, Noto Naskh Arabic, Noto Sans Hebrew (OFL)
-scripts/   serve.mjs  smoke.mjs  build-meta.mjs  build-cities.mjs  build-icons.mjs
+vendor/    adhan.esm.min.js (MIT)
+fonts/     Amiri Quran (Quran text), Amiri (headings), IBM Plex Sans Arabic (UI), Noto Naskh Arabic, Noto Sans Hebrew (OFL)
+scripts/   serve.mjs  smoke.mjs  screenshots.mjs  build-meta.mjs  build-cities.mjs  build-icons.mjs
 tests/     *.test.mjs
 docs/      PLAN.md  SOURCES.md  TO-VERIFY.md  screenshots/
 ```
@@ -166,7 +175,7 @@ to move them.
 ## Licenses
 
 * Adhan (MIT), see `vendor/adhan.LICENSE`.
-* Amiri Quran and Noto fonts (SIL OFL 1.1), see `fonts/OFL-*.txt`.
+* Amiri Quran, Amiri, IBM Plex Sans Arabic and Noto fonts (SIL OFL 1.1), see `fonts/OFL-*.txt`.
 * The Quran text, translations, tafsir and recitations belong to their respective publishers
   and are fetched from the sources listed in SOURCES.md.
 * The app code is yours to license as you choose.

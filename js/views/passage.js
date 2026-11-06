@@ -7,6 +7,7 @@ import { player } from '../core/audio.js';
 import { ayahRange, itemFromId, mushafPos } from '../data/catalog.js';
 import { COUNTS } from '../data/meta.js';
 import { itemTitle, ic } from './ui.js';
+import { starPath } from './viz.js';
 
 export async function loadPassage(item, { tafsir = true } = {}) {
   const ch = chapter(item.surah);
@@ -42,7 +43,7 @@ export function wordsHTML(v, { hide = null, revealed = new Set() } = {}) {
 }
 
 export function ayahEnd(n) {
-  return html`<span class="ayah-end" aria-label="${t('ayahN', { n })}">${fmtNum(n)}</span>`;
+  return html`<span class="ayah-end" role="img" aria-label="${t('ayahN', { n })}"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="${starPath}"/></svg><b>${fmtNum(n)}</b></span>`;
 }
 
 /**

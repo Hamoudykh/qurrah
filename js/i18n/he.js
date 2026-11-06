@@ -211,4 +211,20 @@ export default {
   ayahsN_one: 'פסוק אחד', wordsN_one: 'מילה אחת', ayahsMemorizedN_one: 'פסוק אחד שונן',
   reviewsDueN_one: 'אחת לחזרה היום — כמה דקות שומרות על השינון.', rakahsN_two: 'שתי רכעות',
 
+
+  // redesign (v2)
+  nextPrayerTomorrow: 'התפילה הבאה · מחר', inTime: 'בעוד {time}', setYourPlace: 'איפה אתה?', nowTime: 'עכשיו',
+  reviewsDueShort: '{n} היום', nothingDue: 'הכל מעודכן', qiblaTeaserShort: 'כיוון הכעבה',
+  addToLearningShort: 'ללמוד', share: 'שתף', copied: 'הועתק — הדבק כדי לשתף.',
+  yourJourney: 'המסע שלך', knownOfTotal: '{known} מתוך {total} ידועות', suggested: 'הבאה',
+  makki: 'מכית', madani: 'מדינית', repeatSettings: 'הגדרות חזרה', iMemorizedIt: 'שיננתי',
+  swipeHint: 'החלק או השתמש בחצים כדי לעבור בין הפסוקים', listMode: 'הצג את כל הפסוקים', focusMode: 'חזרה למצב מיקוד',
+  surahsYouKnowShort: 'ידועות', yourSky: 'השמיים שלך', skyHint: 'כל כוכב הוא סורה או קטע, והוא נדלק כשאתה משנן אותו.', legendNew: 'עדיין לא',
+  streakDays: 'ימים ברצף', streakDays_one: 'יום', streakDays_two: 'יומיים ברצף',
+  letsBegin: 'בואו נתחיל', nextWithN: 'הבא · נבחרו {n}', skipForNow: 'עדיין אין — הבא',
+  stepTimesTitle: 'זמני תפילה', stepTimesHint: 'אפשר גישה למיקום כדי לראות את זמני התפילה של היום ואת הקיבלה. אפשר גם לבחור עיר מאוחר יותר בלשונית הזמנים.',
+  startApp: 'בסמלה — מתחילים',
+
+  knownShort: 'אני יודע',
+  xOfY: '{a} מתוך {b}',
 };

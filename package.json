@@ -2,7 +2,7 @@
   "name": "qurrah",
   "version": "1.0.0",
   "private": true,
-  "description": "Qurrah — a salah companion PWA: grow and understand what you recite, pray with khushu'.",
+  "description": "Qurrah \u2014 a salah companion PWA: grow and understand what you recite, pray with khushu'.",
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
@@ -11,7 +11,10 @@
     "meta": "node scripts/build-meta.mjs",
     "cities": "node scripts/build-cities.mjs",
     "icons": "node scripts/build-icons.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "shots": "node scripts/screenshots.mjs"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

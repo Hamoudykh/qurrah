@@ -106,3 +106,22 @@ export function downloadFile(name, text, type = 'text/plain') {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
+
+/** Light haptic tap where supported (Android); silently ignored elsewhere. */
+export function buzz(ms = 10) {
+  try { navigator.vibrate?.(ms); } catch { /* ignore */ }
+}
+
+/** A small gold star burst at an element — used when something is memorized or prayed. */
+export function celebrate(el) {
+  if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = el.getBoundingClientRect();
+  const b = document.createElement('span');
+  b.className = 'burst';
+  b.style.left = `${r.left + r.width / 2}px`;
+  b.style.top = `${r.top + r.height / 2}px`;
+  b.innerHTML = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36}deg;animation-delay:${(i % 3) * 30}ms"></i>`).join('');
+  document.body.appendChild(b);
+  buzz(18);
+  setTimeout(() => b.remove(), 1000);
+}

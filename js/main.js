@@ -1,7 +1,7 @@
 // App shell: router, tabs, theme/language, mini player, service worker, reminders.
 import { getState, subscribe, settings, update } from './core/store.js';
-import { setLang, detectLang, t, getLang } from './core/i18n.js';
-import { $, mount, on } from './core/dom.js';
+import { setLang, t, getLang } from './core/i18n.js';
+import { $, mount, on, esc } from './core/dom.js';
 import { player } from './core/audio.js';
 import { startScheduler } from './core/notify.js';
 import { icon } from './views/ui.js';
@@ -20,9 +20,11 @@ const ROUTES = {
   sources: () => import('./views/sources.js'),
 };
 const TAB_OF = { '': 'today', learn: 'learn', item: 'learn', review: 'me', pray: 'pray', times: 'times', qibla: 'times', me: 'me', settings: 'me', sources: 'me', welcome: '' };
+const DETAIL = new Set(['item', 'review', 'qibla', 'settings', 'sources']);
 
 let cleanup = null;
 let renderToken = 0;
+let lastRoute = null;
 
 export function parseHash() {
   const raw = location.hash.replace(/^#\/?/, '');
@@ -41,7 +43,7 @@ function applyTheme() {
   if (th === 'system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', th);
   const dark = th === 'dark' || (th === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-  $('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0E1513' : '#F6F2E9');
+  $('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0A1311' : '#F4EFE6');
 }
 
 function translateShell() {
@@ -62,8 +64,9 @@ async function render() {
     if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   }
   document.body.classList.toggle('no-tabs', route === 'welcome');
-  const back = $('#back');
-  back.hidden = !['item', 'review', 'qibla', 'settings', 'sources'].includes(route);
+  document.body.classList.toggle('is-detail', DETAIL.has(route));
+  document.body.classList.toggle('is-root', !DETAIL.has(route));
+  $('#back').hidden = !DETAIL.has(route);
   try {
     const mod = await loader();
     if (token !== renderToken) return;
@@ -74,13 +77,20 @@ async function render() {
     };
     ctx.setTitle(t('appName'));
     mount(el, '');
+    // Gentle entrance when the route changes (not on in-page redraws).
+    const routeKey = `${route}/${params.join('/')}`;
+    if (routeKey !== lastRoute) {
+      el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
+      clearTimeout(el._enterT); el._enterT = setTimeout(() => el.classList.remove('enter'), 900);
+      lastRoute = routeKey;
+    }
     const c = (await mod.render(ctx)) || null;
     if (token !== renderToken) { if (c) try { c(); } catch { /* ignore */ } return; } // navigated away meanwhile
     cleanup = c;
     if (!query.keepScroll) window.scrollTo(0, 0);
   } catch (e) {
     console.error(e);
-    mount(el, `<div class="card error"><p>${t('errorGeneric')}</p><pre class="small">${String(e.message || e).replace(/</g, '&lt;')}</pre></div>`);
+    mount(el, `<div class="card error"><p>${t('errorGeneric')}</p><pre class="small">${esc(e.message || e)}</pre></div>`);
   }
 }
 
@@ -91,16 +101,18 @@ function renderMini() {
   if (!c) { mp.hidden = true; document.body.classList.remove('has-mini'); return; }
   mp.hidden = false;
   document.body.classList.add('has-mini');
-  const reps = player.opts.repeat === Infinity ? '∞' : player.opts.repeat;
+  const target = player.opts.repeat === Infinity ? '∞' : player.opts.repeat;
+  const rep = Math.min(player.rep + 1, player.opts.repeat === Infinity ? player.rep + 1 : player.opts.repeat);
   mount(mp, `
-    <button class="mini-info" data-act="open" aria-label="${t('openPassage')}">
-      <span class="mini-title">${(player.meta?.title || '').replace(/</g, '&lt;')} <span class="ltr-num">${c.key}</span></span>
-      <span class="mini-sub">${player.meta?.artist?.replace(/</g, '&lt;') || ''}${player.opts.repeat > 1 ? ` · ${t('repeatShort', { n: Math.min(player.rep + 1, player.opts.repeat === Infinity ? player.rep + 1 : player.opts.repeat), of: reps })}` : ''}</span>
+    <button class="mini-info" data-act="open" aria-label="${esc(t('openPassage'))}">
+      <span class="mini-title">${esc(player.meta?.title || '')} <span class="ltr-num">${esc(c.key)}</span></span>
+      <span class="mini-sub">${esc(player.meta?.artist || '')}${player.opts.repeat > 1 ? ` · ${esc(t('repeatShort', { n: rep, of: target }))}` : ''}</span>
     </button>
-    <button class="icon-btn" data-act="prev" aria-label="${t('previous')}">${icon('prev', 'flip-rtl')}</button>
-    <button class="icon-btn big" data-act="toggle" aria-label="${player.isPlaying ? t('pause') : t('play')}">${icon(player.isPlaying ? 'pause' : 'play')}</button>
-    <button class="icon-btn" data-act="next" aria-label="${t('next')}">${icon('next', 'flip-rtl')}</button>
-    <button class="icon-btn" data-act="close" aria-label="${t('close')}">${icon('close')}</button>`);
+    <button class="icon-btn" data-act="prev" aria-label="${esc(t('previous'))}">${icon('prev', 'flip-rtl')}</button>
+    <button class="icon-btn big" data-act="toggle" aria-label="${esc(player.isPlaying ? t('pause') : t('play'))}">${icon(player.isPlaying ? 'pause' : 'play')}</button>
+    <button class="icon-btn" data-act="next" aria-label="${esc(t('next'))}">${icon('next', 'flip-rtl')}</button>
+    <button class="icon-btn" data-act="close" aria-label="${esc(t('close'))}">${icon('close')}</button>
+    <span class="mini-progress" aria-hidden="true"><span></span></span>`);
 }
 
 function setupMini() {
@@ -114,11 +126,15 @@ function setupMini() {
     else if (a === 'open' && player.meta?.href) location.hash = player.meta.href;
   });
   for (const ev of ['state', 'ayah', 'repeat', 'done']) player.addEventListener(ev, renderMini);
+  player.el.addEventListener('timeupdate', () => {
+    const bar = mp.querySelector('.mini-progress span');
+    if (bar && player.el.duration) bar.style.width = `${(player.el.currentTime / player.el.duration) * 100}%`;
+  });
 }
 
 function boot() {
   const s = getState();
-  if (!s.settings.lang) update((st) => { st.settings.lang = detectLang(); }, { silent: true });
+  if (!s.settings.lang) update((st) => { st.settings.lang = 'ar'; }, { silent: true });
   setLang(settings().lang);
   applyTheme();
   translateShell();
@@ -132,6 +148,7 @@ function boot() {
       lastLang = settings().lang;
       setLang(lastLang);
       translateShell();
+      lastRoute = null;
       render();
       renderMini();
     }
@@ -139,6 +156,7 @@ function boot() {
 
   $('#back').innerHTML = icon('back', 'flip-rtl');
   $('#back').addEventListener('click', () => { if (history.length > 1) history.back(); else location.hash = '#/'; });
+  $('#gear').innerHTML = icon('settings');
   for (const a of document.querySelectorAll('.tabs a')) a.querySelector('.ic-slot').innerHTML = icon(a.dataset.icon);
 
   window.addEventListener('hashchange', render);
