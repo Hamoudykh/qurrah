@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qurrah</title>
+  <meta name="description" content="Grow the surahs you recite in salah, understand them, and pray with khushu'. Quran text, translations and audio from Quran.com. No ads, no tracking, no login.">
+  <meta name="theme-color" content="#F6F2E9">
+  <meta name="color-scheme" content="light dark">
+  <!-- Only the listed content hosts can be contacted: no analytics, no ads, no third-party scripts. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: https://verses.quran.com https://mirrors.quranicaudio.com https://download.quranicaudio.com https://everyayah.com https://cdn.islamic.network; connect-src 'self' https://api.quran.com https://api.alquran.cloud https://geocoding-api.open-meteo.com https://verses.quran.com https://mirrors.quranicaudio.com https://download.quranicaudio.com https://everyayah.com https://cdn.islamic.network; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Qurrah">
+  <link rel="preload" href="fonts/amiri-quran-arabic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip" href="#view" data-i18n="skipToContent">Skip to content</a>
+  <header class="topbar">
+    <button id="back" class="icon-btn" hidden data-i18n-label="back" aria-label="Back"></button>
+    <h1 id="title">Qurrah</h1>
+    <span class="topbar-mark" aria-hidden="true"></span>
+  </header>
+  <main id="view" tabindex="-1" aria-live="polite"></main>
+  <div id="miniplayer" class="miniplayer" hidden></div>
+  <nav class="tabs" aria-label="Main">
+    <a href="#/" data-tab="today" data-icon="today"><span class="ic-slot"></span><span data-i18n="tabToday">Today</span></a>
+    <a href="#/learn" data-tab="learn" data-icon="learn"><span class="ic-slot"></span><span data-i18n="tabLearn">Learn</span></a>
+    <a href="#/pray" data-tab="pray" data-icon="pray"><span class="ic-slot"></span><span data-i18n="tabPray">Pray</span></a>
+    <a href="#/times" data-tab="times" data-icon="times"><span class="ic-slot"></span><span data-i18n="tabTimes">Times</span></a>
+    <a href="#/me" data-tab="me" data-icon="me"><span class="ic-slot"></span><span data-i18n="tabMe">Me</span></a>
+  </nav>
+  <noscript><p style="padding:16px">Qurrah needs JavaScript to load the Quran text from Quran.com.</p></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

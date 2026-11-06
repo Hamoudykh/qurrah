@@ -1,0 +1,25 @@
+{
+  "name": "Qurrah — Salah Companion",
+  "short_name": "Qurrah",
+  "description": "Grow the surahs you recite in salah, understand them, and pray with khushu'. No ads, no tracking, no login.",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F2E9",
+  "theme_color": "#1E5C52",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["education", "lifestyle", "books"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Prayer times", "url": "./#/times", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Review", "url": "./#/review", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Qibla", "url": "./#/qibla", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
