@@ -3,6 +3,7 @@
 
 import { dayKey, dayNumber } from '../logic/dates.js';
 import { newSchedule, knownSchedule, review as srsReview, isDue } from '../logic/srs.js';
+import { withIds, newId, placeToLocation } from '../logic/people.js';
 
 const KEY = 'qurrah:v1';
 const listeners = new Set();
@@ -39,6 +40,8 @@ export const DEFAULTS = Object.freeze({
   planSeed: {}, // dayKey -> shuffle counter
   prayed: {}, // dayKey -> { fajr:true, ... }
   saved: {}, // itemId -> { at, reciter, audio:boolean }
+  people: [], // [{ id, name, places:[{ id, cityId?, label, role, lat, lon, tz, country }], current: placeId }]
+  me: null, // id of the person who uses this phone (their current place sets the main prayer location)
 });
 
 function deepMerge(base, extra) {
@@ -197,4 +200,76 @@ export function resetAll() {
   state = structuredClone(DEFAULTS);
   persist();
   for (const fn of listeners) fn(state);
+}
+
+// ---- people & places ----
+/** Add people (from a setup link or the form). `meIndex` marks who uses this phone. */
+export function addPeople(list, { meIndex = null, labelOf = (pl) => pl.label } = {}) {
+  const added = withIds(list);
+  update((s) => {
+    for (const p of added) {
+      const i = s.people.findIndex((x) => x.name === p.name);
+      if (i >= 0) s.people[i] = { ...p, id: s.people[i].id }; else s.people.push(p);
+    }
+    if (meIndex != null && added[meIndex]) {
+      const me = s.people.find((x) => x.name === added[meIndex].name);
+      s.me = me.id;
+      const pl = me.places.find((x) => x.id === me.current);
+      if (pl) s.settings.prayer.location = placeToLocation(pl, labelOf(pl));
+    }
+  });
+}
+
+export function setCurrentPlace(personId, placeId, labelOf = (pl) => pl.label) {
+  update((s) => {
+    const p = s.people.find((x) => x.id === personId);
+    if (!p) return;
+    p.current = placeId;
+    if (s.me === personId) {
+      const pl = p.places.find((x) => x.id === placeId);
+      if (pl) s.settings.prayer.location = placeToLocation(pl, labelOf(pl));
+    }
+  });
+}
+
+export function setMe(personId, labelOf = (pl) => pl.label) {
+  update((s) => {
+    s.me = personId;
+    const p = s.people.find((x) => x.id === personId);
+    const pl = p?.places.find((x) => x.id === p.current);
+    if (pl) s.settings.prayer.location = placeToLocation(pl, labelOf(pl));
+  });
+}
+
+export function addPerson(name) {
+  const id = newId('p');
+  update((s) => { s.people.push({ id, name, places: [], current: null }); });
+  return id;
+}
+
+export function renamePerson(id, name) {
+  update((s) => { const p = s.people.find((x) => x.id === id); if (p) p.name = name; });
+}
+
+export function removePerson(id) {
+  update((s) => { s.people = s.people.filter((x) => x.id !== id); if (s.me === id) s.me = null; });
+}
+
+export function addPlace(personId, place) {
+  update((s) => {
+    const p = s.people.find((x) => x.id === personId);
+    if (!p) return;
+    const pl = { id: newId('pl'), ...place };
+    p.places.push(pl);
+    if (!p.current) p.current = pl.id;
+  });
+}
+
+export function removePlace(personId, placeId) {
+  update((s) => {
+    const p = s.people.find((x) => x.id === personId);
+    if (!p) return;
+    p.places = p.places.filter((x) => x.id !== placeId);
+    if (p.current === placeId) p.current = p.places[0]?.id || null;
+  });
 }

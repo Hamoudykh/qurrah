@@ -227,4 +227,17 @@ export default {
 
   knownShort: 'אני יודע',
   xOfY: '{a} מתוך {b}',
+
+  // people & places
+  family: 'האנשים שלי', familyHint: 'זמני תפילה בכל מקום שבו האנשים שלך נמצאים. לחץ "קבע כנוכחי" כשמישהו עובר מקום.',
+  familyEmpty: 'הוסף את האנשים שלך ואת המקומות שלהם (בית, לימודים, עבודה) כדי לראות את זמני התפילה אצלם.',
+  role_home: 'בית', role_study: 'לימודים', role_work: 'עבודה', role_other: 'אחר',
+  currentPlace: 'כאן עכשיו', setCurrent: 'קבע כנוכחי', thisIsMe: 'אני', setAsMe: 'זה אני',
+  managePeople: 'עריכת אנשים ומקומות', addPerson: 'הוסף אדם', personName: 'שם', addPlace: 'הוסף', city: 'עיר', placeType: 'סוג מקום',
+  removePerson: 'הסר', removePlace: 'הסר מקום', confirmRemovePerson: 'להסיר את האדם הזה ואת המקומות שלו מהטלפון?', noPlacesYet: 'אין מקומות עדיין',
+  copySetupLink: 'שתף קישור הגדרה עם טלפון אחר', setupLinkCopied: 'הקישור הועתק — שלח אותו למי שתרצה.', setupShareText: 'פתח את הקישור כדי להוסיף את האנשים והמקומות לאפליקציית קורה',
+  setupTitle: 'הוספת האנשים שלך', setupIntro: 'הקישור יוסיף את האנשים והמקומות הבאים לטלפון הזה בלבד.', whoUsesPhone: 'מי משתמש בטלפון הזה?', nobodyHere: 'אף אחד מהם',
+  addToApp: 'הוסף לאפליקציה', setupInvalid: 'הקישור אינו תקין או חסר.', setupDone: 'נוסף',
+  setupPrivacy: 'השמות והמקומות נשמרים רק בטלפון הזה ולא נשלחים לשום שרת. הקישור עצמו מכיל אותם, לכן שתף אותו רק עם מי שאתה סומך עליו.', saved: 'נשמר',
+
 };

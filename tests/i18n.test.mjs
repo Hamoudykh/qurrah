@@ -34,6 +34,7 @@ const DYNAMIC = {
   tab_: ['read', 'memorize', 'why', 'plan', 'recite', 'khushu'],
   theme_: ['system', 'light', 'dark'],
   tr_: ['auto', 'en', 'he', 'both', 'off'],
+  role_: ['home', 'study', 'work', 'other'],
 };
 
 test('every UI key used in code exists in English', async () => {
@@ -51,12 +52,14 @@ test('every UI key used in code exists in English', async () => {
   assert.deepEqual(missing, []);
 });
 
-const PLURAL = /_(zero|one|two|few|many|other)$/;
+const PLURAL_RE = /_(zero|one|two|few|many|other)$/;
+// A key is a plural form only if its base key exists (so e.g. 'role_other' is an ordinary key).
+const PLURAL = { test: (k) => PLURAL_RE.test(k) && k.replace(PLURAL_RE, '') in en };
 
 test('Arabic and Hebrew have exactly the English keys (plus plural forms)', () => {
   for (const [name, d] of [['ar', ar], ['he', he]]) {
     const missing = Object.keys(en).filter((k) => !PLURAL.test(k) && !(k in d));
-    const extra = Object.keys(d).filter((k) => !(k in en) && !(PLURAL.test(k) && k.replace(PLURAL, '') in en));
+    const extra = Object.keys(d).filter((k) => !(k in en) && !(PLURAL.test(k) && k.replace(PLURAL_RE, '') in en));
     assert.deepEqual({ missing, extra }, { missing: [], extra: [] }, name);
   }
 });
@@ -71,7 +74,7 @@ test('placeholders match across languages', () => {
   // Plural forms may drop {n} (e.g. "one ayah") but must not introduce new placeholders.
   for (const d of [en, ar, he]) {
     for (const k of Object.keys(d).filter((x) => PLURAL.test(x))) {
-      const base = en[k.replace(PLURAL, '')];
+      const base = en[k.replace(PLURAL_RE, '')];
       assert.ok(base, k);
       for (const p of ph(d[k]).split(',').filter(Boolean)) assert.ok(ph(base).split(',').includes(p), `${k}: {${p}}`);
     }

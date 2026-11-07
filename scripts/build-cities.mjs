@@ -21,6 +21,19 @@ const LOCAL_QUERY = {
   Jenin: { ar: 'جنين', he: "ג'נין" },
 };
 
+// Local names where the geocoder has none in Arabic/Hebrew (place names only — coordinates
+// and time zones still come from the geocoder).
+const NAME_OVERRIDES = {
+  Karmiel: { ar: 'كرميئيل', he: 'כרמיאל' },
+  'Rosh HaAyin': { ar: 'روش هعاين', he: 'ראש העין' },
+  Tirah: { ar: 'الطيرة', he: 'טירה' },
+  Qalansawe: { ar: 'قلنسوة', he: 'קלנסווה' },
+  'Baqa al-Gharbiyye': { ar: 'باقة الغربية', he: 'באקה אל-גרביה' },
+  'Kafr Kanna': { he: 'כפר כנא' },
+  'Kafr Manda': { ar: 'كفر مندا' },
+  'Umm el Fahm': { he: 'אום אל-פחם' },
+};
+
 // [search name, ISO country code]
 const WANTED = [
   ['Mecca', 'SA'], ['Medina', 'SA'], ['Riyadh', 'SA'], ['Jeddah', 'SA'], ['Dubai', 'AE'], ['Abu Dhabi', 'AE'],
@@ -36,7 +49,10 @@ const WANTED = [
   ['Kazan', 'RU'], ['Sarajevo', 'BA'], ['New York', 'US'], ['Chicago', 'US'], ['Houston', 'US'], ['Los Angeles', 'US'],
   ['Dearborn', 'US'], ['Toronto', 'CA'], ['Montreal', 'CA'], ['Sydney', 'AU'], ['Melbourne', 'AU'],
   ['Jerusalem', 'IL'], ['Nazareth', 'IL'], ['Haifa', 'IL'], ['Umm el Fahm', 'IL'], ['Rahat', 'IL'], ['Tel Aviv', 'IL'],
-  ['Acre', 'IL'], ['Sakhnin', 'IL'], ['Tayibe', 'IL'], ['Beersheba', 'IL'],
+  ['Acre', 'IL'], ['Sakhnin', 'IL'], ['Beersheba', 'IL'],
+  ['Tamra', 'IL'], ['Karmiel', 'IL'], ['Rosh HaAyin', 'IL'], ['Kafr Qasim', 'IL'], ['Tirah', 'IL'],
+  ['Qalansawe', 'IL'], ['Baqa al-Gharbiyye', 'IL'], ['Kafr Kanna', 'IL'],
+  ['Lod', 'IL'], ['Ramla', 'IL'], ['Daliyat al-Karmel', 'IL'], ['Kafr Manda', 'IL'],
   ['Gaza', 'PS'], ['Hebron', 'PS'], ['Nablus', 'PS'], ['Ramallah', 'PS'], ['Jenin', 'PS'],
 ];
 
@@ -68,7 +84,7 @@ for (const [name, cc] of WANTED) {
   const pick = (list) => list.find((r) => r.id === en.id)?.name.replace(/[\u200E\u200F\u202A-\u202E]/g, '') || null;
   out.push({
     id: en.id,
-    name: { en: en.name, ar: pick(ar) || en.name, he: pick(he) || en.name },
+    name: { en: en.name, ar: NAME_OVERRIDES[name]?.ar || pick(ar) || en.name, he: NAME_OVERRIDES[name]?.he || pick(he) || en.name },
     country: en.country_code,
     lat: +en.latitude.toFixed(4),
     lon: +en.longitude.toFixed(4),

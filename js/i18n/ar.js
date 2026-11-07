@@ -231,4 +231,17 @@ export default {
 
   knownShort: 'أحفظها مسبقًا',
   xOfY: '{a} من {b}',
+
+  // people & places
+  family: 'أهلي', familyHint: 'مواقيت الصلاة في كل مدينة يكون فيها أهلك. اضغط «اجعله الحالي» حين ينتقل أحدهم.',
+  familyEmpty: 'أضف أهلك وأماكنهم (البيت، الدراسة، العمل) لترى مواقيت الصلاة عندهم.',
+  role_home: 'البيت', role_study: 'الدراسة', role_work: 'العمل', role_other: 'مكان آخر',
+  currentPlace: 'الآن هنا', setCurrent: 'اجعله الحالي', thisIsMe: 'أنا', setAsMe: 'هذا أنا',
+  managePeople: 'تعديل الأشخاص والأماكن', addPerson: 'إضافة شخص', personName: 'الاسم', addPlace: 'إضافة', city: 'المدينة', placeType: 'نوع المكان',
+  removePerson: 'حذف', removePlace: 'حذف المكان', confirmRemovePerson: 'حذف هذا الشخص وأماكنه من هذا الهاتف؟', noPlacesYet: 'لا أماكن بعد',
+  copySetupLink: 'شارك رابط الإعداد مع هاتف آخر', setupLinkCopied: 'نُسخ الرابط — أرسله لمن تريد.', setupShareText: 'افتح هذا الرابط لإضافة الأشخاص والأماكن إلى تطبيق قُرّة',
+  setupTitle: 'إضافة أهلك', setupIntro: 'سيضيف هذا الرابط الأشخاص والأماكن التالية إلى هذا الهاتف فقط.', whoUsesPhone: 'من يستخدم هذا الهاتف؟', nobodyHere: 'لا أحد منهم',
+  addToApp: 'أضف إلى التطبيق', setupInvalid: 'هذا الرابط غير صالح أو ناقص.', setupDone: 'تمت الإضافة',
+  setupPrivacy: 'الأسماء والأماكن تُحفظ على هذا الهاتف فقط ولا تُرسل إلى أي خادم. الرابط نفسه يحتوي عليها، فشاركه فقط مع من تثق به.', saved: 'تم الحفظ',
+
 };

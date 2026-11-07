@@ -18,9 +18,10 @@ const ROUTES = {
   me: () => import('./views/me.js'),
   settings: () => import('./views/settings.js'),
   sources: () => import('./views/sources.js'),
+  setup: () => import('./views/setup.js'),
 };
-const TAB_OF = { '': 'today', learn: 'learn', item: 'learn', review: 'me', pray: 'pray', times: 'times', qibla: 'times', me: 'me', settings: 'me', sources: 'me', welcome: '' };
-const DETAIL = new Set(['item', 'review', 'qibla', 'settings', 'sources']);
+const TAB_OF = { '': 'today', learn: 'learn', item: 'learn', review: 'me', pray: 'pray', times: 'times', qibla: 'times', me: 'me', settings: 'me', sources: 'me', welcome: '', setup: 'times' };
+const DETAIL = new Set(['item', 'review', 'qibla', 'settings', 'sources', 'setup']);
 
 let cleanup = null;
 let renderToken = 0;
@@ -54,7 +55,7 @@ function translateShell() {
 async function render() {
   const token = ++renderToken;
   const { route, params, query } = parseHash();
-  if (!getState().onboarded && route !== 'welcome' && route !== 'sources') { go('#/welcome', { replace: true }); return; }
+  if (!getState().onboarded && !['welcome', 'sources', 'setup'].includes(route)) { go('#/welcome', { replace: true }); return; }
   const loader = ROUTES[route] || ROUTES[''];
   if (cleanup) { try { cleanup(); } catch { /* ignore */ } cleanup = null; }
   const el = $('#view');

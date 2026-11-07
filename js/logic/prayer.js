@@ -109,6 +109,12 @@ export function formatTime(date, tz, locale) {
   return new Intl.DateTimeFormat(locale, { timeZone: tz, hour: 'numeric', minute: '2-digit' }).format(date);
 }
 
+/** Time without AM/PM (for compact cells where the prayer name already shows the part of day). */
+export function formatTimeBare(date, tz, locale) {
+  const parts = new Intl.DateTimeFormat(locale, { timeZone: tz, hour: 'numeric', minute: '2-digit', hourCycle: 'h12' }).formatToParts(date);
+  return parts.filter((p) => p.type !== 'dayPeriod').map((p) => p.value).join('').trim();
+}
+
 export function formatCountdown(ms) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(total / 3600);

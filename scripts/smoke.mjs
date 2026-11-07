@@ -8,6 +8,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createRequire } from 'node:module';
+import { encodeSetup } from '../js/logic/people.js';
+import { CITIES } from '../js/data/cities.js';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -251,6 +253,28 @@ await check('me: ring shows 5 known; constellation has 44 stars', async () => {
   if ((await page.textContent('.me-head .ring-inner b')).trim() !== '5') throw new Error('known');
   if ((await page.locator('.constellation .st').count()) !== 44) throw new Error('stars');
   if ((await page.locator('.constellation .st.known').count()) !== 5) throw new Error('known stars');
+});
+
+await check('people & places: setup link adds people, each place shows its prayer times', async () => {
+  const pl = (en, role) => { const c = CITIES.find((x) => x.name.en === en); return { cityId: c.id, role, lat: c.lat, lon: c.lon, tz: c.tz }; };
+  const code = encodeSetup([
+    { name: 'Person A', places: [pl('Haifa', 'home'), pl('Karmiel', 'study'), pl('Rosh HaAyin', 'work')] },
+    { name: 'Person B', places: [pl('Tamra', 'home'), pl('Beersheba', 'study')] },
+  ]);
+  await page.goto(`${BASE}#/setup/${code}`);
+  await page.waitForSelector('.setup-person');
+  if ((await page.locator('.setup-person').count()) !== 2) throw new Error('preview');
+  await page.click('[data-act=import]');
+  await page.waitForSelector('.person .mini-times', { timeout: 10000 });
+  if ((await page.locator('.person').count()) !== 2) throw new Error('people');
+  if ((await page.locator('.person .place').count()) !== 5) throw new Error('places');
+  if ((await page.locator('.person .place .mt').count()) !== 25) throw new Error('times');
+  if ((await page.textContent('.times-hero .loc-chip')).trim() !== 'Haifa') throw new Error('main location not Person A home');
+  await page.locator('.person').nth(1).locator('[data-cur]').click();
+  await page.waitForFunction(() => document.querySelectorAll('.person')[1]?.querySelector('.place.current .place-name')?.textContent === 'Beersheba');
+  await go('#/');
+  await page.waitForSelector('.fam-list li');
+  if ((await page.locator('.fam-list li').count()) !== 2) throw new Error('today family card');
 });
 
 await check('Arabic interface: RTL and Arabic labels', async () => {

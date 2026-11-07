@@ -236,4 +236,17 @@ export default {
 
   knownShort: 'I know it',
   xOfY: '{a} of {b}',
+
+  // people & places
+  family: 'My people', familyHint: 'Prayer times wherever your people are. Tap “Set as current” when someone moves between places.',
+  familyEmpty: 'Add your people and their places (home, study, work) to see prayer times where they are.',
+  role_home: 'Home', role_study: 'Study', role_work: 'Work', role_other: 'Other',
+  currentPlace: 'Here now', setCurrent: 'Set as current', thisIsMe: 'Me', setAsMe: 'This is me',
+  managePeople: 'Edit people & places', addPerson: 'Add person', personName: 'Name', addPlace: 'Add', city: 'City', placeType: 'Type of place',
+  removePerson: 'Remove', removePlace: 'Remove place', confirmRemovePerson: 'Remove this person and their places from this phone?', noPlacesYet: 'No places yet',
+  copySetupLink: 'Share setup link with another phone', setupLinkCopied: 'Link copied — send it to whoever you like.', setupShareText: 'Open this link to add these people and places to Qurrah',
+  setupTitle: 'Add your people', setupIntro: 'This link will add the following people and places to this phone only.', whoUsesPhone: 'Who uses this phone?', nobodyHere: 'None of them',
+  addToApp: 'Add to the app', setupInvalid: 'This link is invalid or incomplete.', setupDone: 'Added',
+  setupPrivacy: 'Names and places are stored only on this phone and never sent to a server. The link itself contains them, so only share it with people you trust.', saved: 'Saved',
+
 };

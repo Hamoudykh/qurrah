@@ -13,6 +13,7 @@ import { chapter } from '../core/api.js';
 import { player } from '../core/audio.js';
 import { ic, itemTitle, rangeLabel, errorBox, surahName } from './ui.js';
 import { ring, prayerIcon, skyPeriod, skyArc, skyStars } from './viz.js';
+import { personAvatar, personNext } from './people-ui.js';
 import { loadPassage, wordsHTML, ayahEnd, translationModes, queueAudio, plannerPool } from './passage.js';
 
 export async function render(ctx) {
@@ -77,6 +78,13 @@ export async function render(ctx) {
       <a class="q-tile" href="#/qibla"><span class="q-ic sky">${ic('compass')}</span><span class="q-text"><b>${t('qibla')}</b><small>${qibla != null ? html`<span dir="ltr">${fmtNum(qibla)}°</span>` : t('qiblaTeaserShort')}</small></span></a>
       <a class="q-tile" href="#/pray?tab=khushu"><span class="q-ic dusk">${ic('heart')}</span><span class="q-text"><b>${t('tab_khushu')}</b><small>${t('beforeYouPrayHint')}</small></span></a>
     </div>
+
+    ${s.people.length ? html`<div class="section-title"><h3>${ic('heart')} ${t('family')}</h3><a class="small" href="#/times">${t('allTimes')}</a></div>
+    <section class="card"><ul class="fam-list">${s.people.map((p, i) => {
+      const n = personNext(p);
+      return html`<li>${personAvatar(p, i)}<span class="pl-main"><b>${p.name}</b><small>${n ? html`${L(n.pl.label)} · ${t(`role_${n.pl.role}`)}` : t('noPlacesYet')}</small></span>
+        ${n ? html`<span class="fam-next"><small>${t(`prayer_${n.r.next.key}`)}</small><b dir="ltr">${formatTime(n.r.next.time, n.pl.tz, intlLocale())}</b></span>` : ''}</li>`;
+    })}</ul></section>` : ''}
 
     <section class="card verse-card" id="daily" aria-labelledby="daily-h"><div class="skeleton" aria-label="${t('loadingDaily')}"><i></i><i></i><i></i></div></section>
 

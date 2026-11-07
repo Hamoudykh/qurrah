@@ -8,6 +8,7 @@ import { CITIES } from '../data/cities.js';
 import { requestPermission, permission, notify, notificationsSupported } from '../core/notify.js';
 import { ic } from './ui.js';
 import { prayerIcon, skyPeriod, skyStars } from './viz.js';
+import { peopleSection, bindPeople } from './people-ui.js';
 import * as adhan from '../../vendor/adhan.esm.min.js';
 
 export async function render(ctx) {
@@ -108,6 +109,8 @@ export async function render(ctx) {
 
       <a class="q-tile" href="#/qibla"><span class="q-ic sky">${ic('compass')}</span><span class="q-text"><b>${t('qibla')}</b><small>${t('qiblaTeaser')}</small></span><span style="margin-inline-start:auto">${ic('forward', 'flip-rtl')}</span></a>
 
+      ${peopleSection(now)}
+
       <section class="card">
         <h3>${t('calculation')}</h3>
         <label class="field"><span>${t('method')}</span><select data-pset="method">${METHODS.map((m) => html`<option value="${m}" ${ps.method === m ? 'selected' : ''}>${t(`method_${m}`)}</option>`)}</select></label>
@@ -145,6 +148,7 @@ export async function render(ctx) {
   draw();
 
   const offs = [
+    bindPeople(ctx.el, () => { const y = scrollY; draw(); scrollTo(0, y); }),
     on(ctx.el, 'click', '[data-act]', async (e, b) => {
       const a = b.dataset.act;
       if (a === 'edit-loc') { editing = true; draw(); }
