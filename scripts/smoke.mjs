@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // End-to-end smoke test in a phone-sized Chromium against the LIVE Quran.com API.
-// Usage: node scripts/smoke.mjs
+// Usage: QURRAH_CODE=<access code> node scripts/smoke.mjs
+// Without QURRAH_CODE the code-entry checks are skipped and the access screen is bypassed.
 // Needs `playwright` resolvable. Honors HTTPS_PROXY if set.
 // (Screenshots for the docs are made by scripts/screenshots.mjs.)
 import { spawn } from 'node:child_process';
@@ -43,13 +44,44 @@ async function check(name, fn) {
 const go = async (hash) => { await page.evaluate((h) => { location.hash = h; }, hash); await page.waitForTimeout(200); };
 const dayNum = () => Math.floor(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) / 86400000);
 
-await check('first launch is Arabic, right-to-left', async () => {
+const CODE = process.env.QURRAH_CODE || '';
+const arabicDigits = (s) => [...s].map((d) => String.fromCharCode(0x660 + Number(d))).join('');
+const skip = (name) => { step++; results.push(`skip ${step}. ${name} (set QURRAH_CODE)`); };
+
+await check('first launch: access code screen, Arabic, right-to-left, no tabs', async () => {
   await page.goto(BASE);
-  await page.waitForSelector('.onb-hero .onb-name');
+  await page.waitForSelector('.gate #gate-code');
   const { lang, dir } = await page.evaluate(() => ({ lang: document.documentElement.lang, dir: document.documentElement.dir }));
   if (lang !== 'ar' || dir !== 'rtl') throw new Error(`${lang}/${dir}`);
-  if ((await page.textContent('[data-go="1"]')).trim() !== 'لنبدأ') throw new Error('welcome button not Arabic');
+  if (await page.isVisible('.tabs')) throw new Error('tabs visible');
+  if ((await page.textContent('#gate-go')).trim() !== 'دخول') throw new Error('button not Arabic');
 });
+
+await check('access code: a wrong code is refused and nothing opens', async () => {
+  await page.fill('#gate-code', CODE === '000000' ? '111111' : '000000');
+  await page.waitForFunction(() => document.querySelector('#gate-msg.bad')?.textContent.length > 0);
+  if (await page.evaluate(() => localStorage.getItem('qurrah:access'))) throw new Error('unlocked by a wrong code');
+  if (!(await page.isVisible('.gate'))) throw new Error('gate gone');
+});
+
+if (CODE) {
+  await check('access code: the right code typed in Arabic digits opens the welcome screen', async () => {
+    await page.fill('#gate-code', arabicDigits(CODE));
+    await page.waitForSelector('[data-go="1"]', { timeout: 10000 });
+    if ((await page.textContent('[data-go="1"]')).trim() !== 'لنبدأ') throw new Error('welcome button not Arabic');
+  });
+  await check('access code: asked only once (reload goes straight in)', async () => {
+    await page.reload();
+    await page.waitForSelector('[data-go="1"]');
+    if (await page.locator('.gate').count()) throw new Error('asked again');
+  });
+} else {
+  skip('access code: the right code opens the welcome screen');
+  skip('access code: asked only once');
+  await page.evaluate(async () => { const { ACCESS } = await import('./js/core/access.js'); localStorage.setItem('qurrah:access', ACCESS.id); });
+  await page.reload();
+  await page.waitForSelector('[data-go="1"]');
+}
 
 await check('onboarding: switch to English, pick 5 known surahs, finish', async () => {
   await page.click('[data-lang=en]');
@@ -276,6 +308,22 @@ await check('people & places: setup link adds people, each place shows its praye
   await page.waitForSelector('.fam-list li');
   if ((await page.locator('.fam-list li').count()) !== 2) throw new Error('today family card');
 });
+
+if (CODE) {
+  await check('setup link on a new phone: code screen first, then the setup continues', async () => {
+    const pl = (en, role) => { const c = CITIES.find((x) => x.name.en === en); return { cityId: c.id, role, lat: c.lat, lon: c.lon, tz: c.tz }; };
+    const code = encodeSetup([{ name: 'Person C', places: [pl('Tamra', 'home')] }]);
+    const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, timezoneId: 'Asia/Jerusalem' });
+    const p2 = await ctx2.newPage();
+    p2.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+    await p2.goto(`${BASE}#/setup/${code}`);
+    await p2.waitForSelector('.gate #gate-code');
+    await p2.fill('#gate-code', CODE);
+    await p2.waitForSelector('.setup-person', { timeout: 10000 });
+    if (!(await p2.textContent('.setup-person')).includes('Person C')) throw new Error('setup preview');
+    await ctx2.close();
+  });
+} else skip('setup link on a new phone: code screen first');
 
 await check('Arabic interface: RTL and Arabic labels', async () => {
   await go('#/settings');

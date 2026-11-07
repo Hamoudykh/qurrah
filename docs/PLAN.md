@@ -16,6 +16,8 @@
    when scholars differ. Anything I could not confirm is listed in `TO-VERIFY.md`.
 4. No accounts, ads or analytics. All progress stays in `localStorage` on the device and can
    be exported to or imported from a JSON file.
+   A one-time access code (checked on the device against a salted hash) is asked the first
+   time the app is opened on a device. It is not a login and not real security; see README.
 
 ## 2. App structure
 

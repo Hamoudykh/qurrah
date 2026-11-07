@@ -3,17 +3,17 @@
 // "qurrah-data-v1" / "qurrah-audio-v1") when you open or save a passage.
 // Bump VERSION when files change; shell files are also refreshed in the background.
 
-const VERSION = 'v2.1.0';
+const VERSION = 'v2.2.0';
 const SHELL_CACHE = `qurrah-shell-${VERSION}`;
 
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/app.css',
   './js/main.js',
-  './js/core/api.js', './js/core/audio.js', './js/core/dom.js', './js/core/i18n.js', './js/core/notify.js', './js/core/store.js',
+  './js/core/access.js', './js/core/api.js', './js/core/audio.js', './js/core/dom.js', './js/core/i18n.js', './js/core/notify.js', './js/core/store.js',
   './js/logic/dates.js', './js/logic/people.js', './js/logic/ics.js', './js/logic/planner.js', './js/logic/prayer.js', './js/logic/qibla.js', './js/logic/srs.js', './js/logic/suggest.js',
   './js/data/catalog.js', './js/data/cities.js', './js/data/daily.js', './js/data/fiqh.js', './js/data/khushu.js', './js/data/meta.js', './js/data/refs.js', './js/data/virtues.js',
   './js/i18n/en.js', './js/i18n/ar.js', './js/i18n/he.js',
-  './js/views/item.js', './js/views/learn.js', './js/views/me.js', './js/views/passage.js', './js/views/people-ui.js', './js/views/setup.js', './js/views/pray.js', './js/views/qibla.js',
+  './js/views/gate.js', './js/views/item.js', './js/views/learn.js', './js/views/me.js', './js/views/passage.js', './js/views/people-ui.js', './js/views/setup.js', './js/views/pray.js', './js/views/qibla.js',
   './js/views/review.js', './js/views/settings.js', './js/views/sources.js', './js/views/times.js', './js/views/today.js', './js/views/ui.js', './js/views/viz.js', './js/views/welcome.js',
   './vendor/adhan.esm.min.js',
   './fonts/amiri-quran-arabic.woff2', './fonts/amiri-quran-latin.woff2',

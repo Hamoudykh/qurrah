@@ -248,5 +248,8 @@ export default {
   setupTitle: 'Add your people', setupIntro: 'This link will add the following people and places to this phone only.', whoUsesPhone: 'Who uses this phone?', nobodyHere: 'None of them',
   addToApp: 'Add to the app', setupInvalid: 'This link is invalid or incomplete.', setupDone: 'Added',
   setupPrivacy: 'Names and places are stored only on this phone and never sent to a server. The link itself contains them, so only share it with people you trust.', saved: 'Saved',
-
+  // access code (first run)
+  gateTitle: 'Enter your access code', gateText: 'This app is private. Enter the code you were given. You only need it once on this phone.',
+  gateCode: 'Access code', gateEnter: 'Enter', gateChecking: 'Checking…', gateWrong: 'That code is not right. Try again.',
+  gateWait: 'Too many tries. Wait a moment, then try again.', gateNote: 'No account and no sign-up. The code is checked on this phone only.',
 };

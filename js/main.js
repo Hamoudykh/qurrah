@@ -4,6 +4,7 @@ import { setLang, t, getLang } from './core/i18n.js';
 import { $, mount, on, esc } from './core/dom.js';
 import { player } from './core/audio.js';
 import { startScheduler } from './core/notify.js';
+import { isUnlocked } from './core/access.js';
 import { icon } from './views/ui.js';
 
 const ROUTES = {
@@ -20,7 +21,7 @@ const ROUTES = {
   sources: () => import('./views/sources.js'),
   setup: () => import('./views/setup.js'),
 };
-const TAB_OF = { '': 'today', learn: 'learn', item: 'learn', review: 'me', pray: 'pray', times: 'times', qibla: 'times', me: 'me', settings: 'me', sources: 'me', welcome: '', setup: 'times' };
+const TAB_OF = { '': 'today', learn: 'learn', item: 'learn', review: 'me', pray: 'pray', times: 'times', qibla: 'times', me: 'me', settings: 'me', sources: 'me', welcome: '', setup: 'times', gate: '' };
 const DETAIL = new Set(['item', 'review', 'qibla', 'settings', 'sources', 'setup']);
 
 let cleanup = null;
@@ -54,9 +55,14 @@ function translateShell() {
 
 async function render() {
   const token = ++renderToken;
-  const { route, params, query } = parseHash();
-  if (!getState().onboarded && !['welcome', 'sources', 'setup'].includes(route)) { go('#/welcome', { replace: true }); return; }
-  const loader = ROUTES[route] || ROUTES[''];
+  const parsed = parseHash();
+  const { params, query } = parsed;
+  // First run on this device: the access code screen comes before everything, and the URL is
+  // kept, so a setup link continues once the code is entered.
+  const locked = !isUnlocked();
+  const route = locked ? 'gate' : parsed.route;
+  if (!locked && !getState().onboarded && !['welcome', 'sources', 'setup'].includes(route)) { go('#/welcome', { replace: true }); return; }
+  const loader = locked ? () => import('./views/gate.js') : (ROUTES[route] || ROUTES['']);
   if (cleanup) { try { cleanup(); } catch { /* ignore */ } cleanup = null; }
   const el = $('#view');
   const tab = TAB_OF[route] ?? 'today';
@@ -64,7 +70,7 @@ async function render() {
     a.classList.toggle('active', a.dataset.tab === tab);
     if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   }
-  document.body.classList.toggle('no-tabs', route === 'welcome');
+  document.body.classList.toggle('no-tabs', route === 'welcome' || route === 'gate');
   document.body.classList.toggle('is-detail', DETAIL.has(route));
   document.body.classList.toggle('is-root', !DETAIL.has(route));
   $('#back').hidden = !DETAIL.has(route);
@@ -75,6 +81,7 @@ async function render() {
       el, params, query, route,
       setTitle: (s) => { $('#title').textContent = s; document.title = s === t('appName') ? s : `${s} · ${t('appName')}`; },
       isCurrent: () => token === renderToken,
+      onUnlock: () => render(),
     };
     ctx.setTitle(t('appName'));
     mount(el, '');
