@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { encodeSetup, decodeSetup, withIds } from '../js/logic/people.js';
+import { encodeSetup, decodeSetup, withIds, extractSetupCode } from '../js/logic/people.js';
 import { CITIES } from '../js/data/cities.js';
 
 const city = (en) => CITIES.find((c) => c.name.en === en);
@@ -35,4 +35,17 @@ test('setup link rejects malformed or hostile input', () => {
   const cleaned = decodeSetup(enc({ v: 1, p: [{ n: '<b>Hi</b>', pl: [{ a: 1, o: 1, z: 'Asia/Jerusalem', r: 'zz' }] }] }), CITIES);
   assert.equal(cleaned[0].name, 'bHi/b');
   assert.equal(cleaned[0].places[0].role, 'other');
+});
+
+test('a setup code is found in a pasted link, a whole message, or on its own', () => {
+  const c = city('Tamra');
+  const code = encodeSetup([{ name: 'X', places: [{ cityId: c.id, role: 'home', lat: c.lat, lon: c.lon, tz: c.tz }] }]);
+  const url = `https://example.github.io/qurrah/#/setup/${code}`;
+  assert.equal(extractSetupCode(url), code);
+  assert.equal(extractSetupCode(`افتح هذا الرابط لإضافة الأشخاص ${url} شكرًا`), code);
+  assert.equal(extractSetupCode(`  ${code}\n`), code);
+  assert.equal(decodeSetup(extractSetupCode(url), CITIES)[0].name, 'X');
+  assert.equal(extractSetupCode('hello there'), null);
+  assert.equal(extractSetupCode(''), null);
+  assert.equal(extractSetupCode(null), null);
 });

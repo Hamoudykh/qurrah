@@ -79,3 +79,11 @@ export function withIds(people) {
 export function placeToLocation(pl, labelText) {
   return { mode: 'city', lat: pl.lat, lon: pl.lon, tz: pl.tz, label: labelText, country: pl.country || '' };
 }
+
+/** Find a setup code in pasted text: a full link (even inside a message) or the bare code. */
+export function extractSetupCode(text) {
+  const s = String(text ?? '').trim();
+  const m = s.match(/#\/setup\/([A-Za-z0-9_-]+)/);
+  if (m) return m[1];
+  return /^[A-Za-z0-9_-]{8,4000}$/.test(s) ? s : null;
+}

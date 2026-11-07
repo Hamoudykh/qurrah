@@ -17,8 +17,23 @@ export async function render(ctx) {
     return;
   }
   let meIndex = 0;
+  // iPhone keeps the Home Screen app's storage apart from Safari, and the icon always opens the
+  // start page, so a link opened here never reaches the installed app. Say so, and how.
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  const iosSafari = ios && !standalone;
 
   const draw = () => mount(ctx.el, html`
+    ${iosSafari ? html`<section class="card ios-hint">
+      <h3>${ic('info')} ${t('iosSetupTitle')}</h3>
+      <p class="small">${t('iosSetupWhy')}</p>
+      <ol class="small">
+        <li>${t('iosStep1')}</li>
+        <li>${t('iosStep2')}</li>
+        <li>${t('iosStep3')}</li>
+      </ol>
+      <button class="btn wide gold" data-act="copy-link">${ic('share')} ${t('copyThisLink')}</button>
+    </section>` : ''}
     <section class="card setup">
       <div class="ornament" aria-hidden="true">${ic('heart')}</div>
       <h2 class="display center">${t('setupTitle')}</h2>
@@ -38,6 +53,9 @@ export async function render(ctx) {
   draw();
 
   const offs = [
+    on(ctx.el, 'click', '[data-act=copy-link]', async () => {
+      try { await navigator.clipboard.writeText(location.href); toast(t('linkCopied')); } catch { toast(location.href, 6000); }
+    }),
     on(ctx.el, 'click', '[data-mi]', (e, b) => { meIndex = +b.dataset.mi; draw(); }),
     on(ctx.el, 'click', '[data-act=import]', (e, b) => {
       addPeople(people, { meIndex: meIndex >= 0 ? meIndex : null, labelOf: (pl) => L(pl.label) });

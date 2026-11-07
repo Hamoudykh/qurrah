@@ -3,7 +3,7 @@
 // "qurrah-data-v1" / "qurrah-audio-v1") when you open or save a passage.
 // Bump VERSION when files change; shell files are also refreshed in the background.
 
-const VERSION = 'v2.2.0';
+const VERSION = 'v2.3.0';
 const SHELL_CACHE = `qurrah-shell-${VERSION}`;
 
 const SHELL = [

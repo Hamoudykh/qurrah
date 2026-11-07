@@ -296,6 +296,7 @@ await check('people & places: setup link adds people, each place shows its praye
   await page.goto(`${BASE}#/setup/${code}`);
   await page.waitForSelector('.setup-person');
   if ((await page.locator('.setup-person').count()) !== 2) throw new Error('preview');
+  if (await page.locator('.ios-hint').count()) throw new Error('iPhone hint shown on a non-iPhone');
   await page.click('[data-act=import]');
   await page.waitForSelector('.person .mini-times', { timeout: 10000 });
   if ((await page.locator('.person').count()) !== 2) throw new Error('people');
@@ -324,6 +325,40 @@ if (CODE) {
     await ctx2.close();
   });
 } else skip('setup link on a new phone: code screen first');
+
+if (CODE) {
+  await check('iPhone: Safari shows how to move the link into the Home Screen app; pasting it there works', async () => {
+    const pl = (en, role) => { const c = CITIES.find((x) => x.name.en === en); return { cityId: c.id, role, lat: c.lat, lon: c.lon, tz: c.tz }; };
+    const code = encodeSetup([{ name: 'Person D', places: [pl('Tamra', 'home'), pl('Beersheba', 'study')] }]);
+    const url = `${BASE}#/setup/${code}`;
+    const ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
+    const opts = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, timezoneId: 'Asia/Jerusalem', userAgent: ua };
+    // 1) the link opened in Safari: the hint is shown
+    const safari = await browser.newContext(opts);
+    const p1 = await safari.newPage();
+    p1.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+    await p1.goto(url);
+    await p1.fill('#gate-code', CODE);
+    await p1.waitForSelector('.ios-hint [data-act=copy-link]', { timeout: 10000 });
+    await safari.close();
+    // 2) the Home Screen app (separate storage, opens at the start page): paste the link on the welcome screen
+    const app = await browser.newContext(opts);
+    const p2 = await app.newPage();
+    p2.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+    await p2.goto(`${BASE}#/`);
+    await p2.fill('#gate-code', CODE);
+    await p2.waitForSelector('.paste-card summary', { timeout: 10000 });
+    await p2.click('.paste-card summary');
+    await p2.fill('.paste-card input[name=link]', `افتح هذا الرابط ${url}`);
+    await p2.click('.paste-card .btn');
+    await p2.waitForSelector('.setup-person', { timeout: 10000 });
+    await p2.click('[data-act=import]');
+    await p2.waitForSelector('[data-go="1"]', { timeout: 10000 });
+    const n = await p2.evaluate(() => JSON.parse(localStorage.getItem('qurrah:v1')).people.length);
+    if (n !== 1) throw new Error(`people ${n}`);
+    await app.close();
+  });
+} else skip('iPhone: paste the setup link inside the Home Screen app');
 
 await check('Arabic interface: RTL and Arabic labels', async () => {
   await go('#/settings');

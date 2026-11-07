@@ -5,6 +5,7 @@ import { CATALOG } from '../data/catalog.js';
 import { chapter } from '../core/api.js';
 import { suggestMethod } from '../logic/prayer.js';
 import { ic, arabicName } from './ui.js';
+import { pasteSetupForm, bindPasteSetup } from './people-ui.js';
 
 export async function render(ctx) {
   ctx.setTitle(t('welcomeTitle'));
@@ -29,6 +30,11 @@ export async function render(ctx) {
       <li><span class="q-ic dusk">${ic('heart')}</span><span>${t('welcomePoint3')}</span></li>
       <li><span class="q-ic sky">${ic('wifiOff')}</span><span>${t('welcomePoint4')}</span></li>
     </ul>
+    <details class="card manage paste-card">
+      <summary>${ic('heart')} ${t('haveSetupLink')}</summary>
+      <p class="small muted">${t('pasteSetupHint')}</p>
+      ${pasteSetupForm()}
+    </details>
     <div class="onb-actions"><button class="btn primary" data-go="1">${t('letsBegin')}</button></div>
     <p class="small muted center">${t('privacyNote')} <a href="#/sources">${t('sourcesAndCredits')}</a></p>
   </div>`;
@@ -71,6 +77,7 @@ export async function render(ctx) {
   };
 
   const offs = [
+    bindPasteSetup(ctx.el),
     on(ctx.el, 'click', '[data-lang]', (e, b) => { setSetting('lang', b.dataset.lang); }),
     on(ctx.el, 'click', '[data-go]', (e, b) => { step = +b.dataset.go; draw(); window.scrollTo(0, 0); }),
     on(ctx.el, 'click', '[data-pick]', (e, b) => {

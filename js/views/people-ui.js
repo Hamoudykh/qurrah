@@ -3,7 +3,7 @@ import { html, on, toast, celebrate } from '../core/dom.js';
 import { t, L, intlLocale } from '../core/i18n.js';
 import { getState, settings, setCurrentPlace, setMe, addPerson, renamePerson, removePerson, addPlace, removePlace } from '../core/store.js';
 import { todayAndNext, formatTimeBare, FARD } from '../logic/prayer.js';
-import { ROLES, encodeSetup } from '../logic/people.js';
+import { ROLES, encodeSetup, decodeSetup, extractSetupCode } from '../logic/people.js';
 import { CITIES } from '../data/cities.js';
 import { ic } from './ui.js';
 
@@ -19,6 +19,25 @@ export function personNext(p, now = new Date()) {
   const pl = p.places.find((x) => x.id === p.current) || p.places[0];
   if (!pl) return null;
   return { pl, r: todayAndNext(pl.lat, pl.lon, pl.tz, settings().prayer, now) };
+}
+
+/** "Have a setup link?" — paste a link inside the app. Needed on iPhone, where the Home Screen
+ *  app keeps its storage apart from Safari and always opens at its start page. */
+export function pasteSetupForm() {
+  return html`<form class="paste-setup" data-form="paste-setup">
+    <input name="link" type="text" inputmode="url" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="${t('pasteSetupPlaceholder')}" aria-label="${t('pasteSetupPlaceholder')}" required>
+    <button class="btn small primary">${t('pasteSetupGo')}</button>
+  </form>`;
+}
+
+export function bindPasteSetup(root) {
+  return on(root, 'submit', '[data-form=paste-setup]', (e, f) => {
+    e.preventDefault();
+    const code = extractSetupCode(new FormData(f).get('link'));
+    try { if (!code) throw new Error('no code'); decodeSetup(code, CITIES); } catch { toast(t('setupInvalid')); return; }
+    location.hash = `#/setup/${code}`;
+  });
 }
 
 export function peopleSection(now = new Date()) {
@@ -77,6 +96,7 @@ export function peopleSection(now = new Date()) {
         <input name="name" type="text" maxlength="40" placeholder="${t('personName')}" aria-label="${t('personName')}" required>
         <button class="btn small primary">${ic('plus')} ${t('addPerson')}</button>
       </form>
+      <div class="paste-block"><b>${t('haveSetupLink')}</b><p class="small muted">${t('pasteSetupHint')}</p>${pasteSetupForm()}</div>
       ${people.some((p) => p.places.length) ? html`<button class="btn wide" style="margin-top:12px" data-act="share-setup">${ic('share')} ${t('copySetupLink')}</button>
         <p class="small muted" style="margin-bottom:0">${t('setupPrivacy')}</p>` : ''}
     </details>`;
@@ -85,6 +105,7 @@ export function peopleSection(now = new Date()) {
 /** Wire up the people section inside `root`. `redraw` re-renders the host view. */
 export function bindPeople(root, redraw) {
   const offs = [
+    bindPasteSetup(root),
     on(root, 'click', '[data-cur]', (e, b) => {
       const [pid, plid] = b.dataset.cur.split('|');
       setCurrentPlace(pid, plid, labelOf);

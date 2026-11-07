@@ -95,7 +95,7 @@ Notifications on iPhone require iOS 16.4+ and the app installed to the Home Scre
 npm test
 ```
 
-33 unit tests, no dependencies (Node ≥ 18). They cover:
+34 unit tests, no dependencies (Node ≥ 18). They cover:
 * spaced repetition, planner rules, qibla (checked against the Adhan library), prayer times, .ics output, streaks
 * level rules against the API word counts
 * reference well-formedness
@@ -103,17 +103,17 @@ npm test
 * service-worker coverage of every app file
 * the "no Quran text in source" guard
 * the Arabic-default migration for existing users
-* people & places setup links (round trip, hostile input)
+* people & places setup links (round trip, hostile input, finding the link in pasted text)
 * the access code (digit normalisation incl. Arabic digits, hash check, remembered per device)
 
 ```bash
 QURRAH_CODE=<access code> npm run smoke
 ```
 
-An end-to-end run (32 checks) in a phone-sized Chromium against the **live** Quran.com API:
+An end-to-end run (33 checks) in a phone-sized Chromium against the **live** Quran.com API:
 the access code screen (wrong code refused, right code in Arabic digits, asked once, setup link continues after it), Arabic-first launch, onboarding, daily verse, reading, audio, focus mode and the repeat ring,
 hide-words, Ibn Kathir, saving audio offline,
-a custom passage, a review, the Tanzil fallback, prayer times, qibla, the calendar export, people & places,
+a custom passage, a review, the Tanzil fallback, prayer times, qibla, the calendar export, people & places (including the iPhone Home Screen paste flow),
 Arabic/Hebrew/dark mode, and an offline reload. It needs Playwright
 (`npm i -D playwright && npx playwright install chromium`). Add `-- --shots=docs/screenshots`
 to regenerate the screenshots (or run `npm run shots` for the docs set).
@@ -179,6 +179,12 @@ to move them.
 The first time the app is opened on a device it asks for an access code; after the right code
 it never asks again on that device. Digits typed on an Arabic keyboard (٠١٢…) work too, and a
 setup link opened on a new phone continues straight to the setup once the code is entered.
+
+**iPhone:** an app added to the Home Screen keeps its own storage, separate from Safari, and
+always opens at its start page. So a setup link opened in Safari never reaches it. The setup
+page says this on iPhone (with a *Copy link* button), and the app has a **"Have a setup link?"**
+box (welcome screen, and Times → My people) to paste the link from inside the installed app.
+The access code is asked once in each of the two (Safari and the Home Screen app).
 
 * **What it is:** the repository only holds a salted PBKDF2-SHA-256 hash of the code
   (`js/core/access.js`), never the code itself. The check runs on the phone.

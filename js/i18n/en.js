@@ -252,4 +252,11 @@ export default {
   gateTitle: 'Enter your access code', gateText: 'This app is private. Enter the code you were given. You only need it once on this phone.',
   gateCode: 'Access code', gateEnter: 'Enter', gateChecking: 'Checking…', gateWrong: 'That code is not right. Try again.',
   gateWait: 'Too many tries. Wait a moment, then try again.', gateNote: 'No account and no sign-up. The code is checked on this phone only.',
+  // setup link inside the app (iPhone Home Screen)
+  haveSetupLink: 'Have a setup link?', pasteSetupHint: 'If someone sent you a Qurrah setup link, paste it here to add their names, cities and prayer times.',
+  pasteSetupPlaceholder: 'Paste the link here', pasteSetupGo: 'Continue',
+  iosSetupTitle: 'Using Qurrah from your Home Screen?', iosSetupWhy: 'On iPhone, the Home Screen app keeps its data separate from Safari, so add this link from inside the app:',
+  iosStep1: 'Copy this link.', iosStep2: 'Open Qurrah from its Home Screen icon (it asks for the access code once there).',
+  iosStep3: 'Paste it under “Have a setup link?” (on the welcome screen, or in Times → My people).',
+  copyThisLink: 'Copy this link', linkCopied: 'Link copied',
 };

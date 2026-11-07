@@ -757,6 +757,15 @@ html:not(:lang(ar)) .avatar { font-family: var(--font); }
 .manage-places li { display: flex; align-items: center; gap: 6px; }
 .manage-places li .icon-btn { margin-inline-start: auto; height: 34px; min-width: 34px; }
 .manage form select { width: auto; flex: 1; min-height: 40px; }
+.paste-setup { display: flex; gap: 8px; }
+.paste-setup input { flex: 1; min-width: 0; min-height: 42px; }
+.paste-block { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.paste-block p { margin: 2px 0 8px; }
+.paste-card { margin-top: 12px; }
+.paste-card p { margin: 10px 0 8px; }
+.ios-hint { border: 1.5px solid var(--gold); background: var(--gold-soft); }
+.ios-hint h3 { margin-bottom: 4px; }
+.ios-hint ol { margin: 6px 0 12px; padding-inline-start: 1.3em; display: grid; gap: 4px; }
 .fam-list { list-style: none; padding: 0; margin: 0; }
 .fam-list li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
 .fam-list li:first-child { border-top: 0; }
